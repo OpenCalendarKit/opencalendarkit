@@ -47,8 +47,8 @@
     var $fb = $m.find('.bkit-feedback');
 
     var data = {
-      action: 'bkit_mvp_save_closed_day',
-      nonce:  BKIT_MVP_ADMIN.nonce,
+      action: 'okit_save_closed_day',
+      nonce:  OPEN_CALENDAR_KIT_ADMIN.nonce,
       date:   $(this).find('input[name="date"]').val(),
       reason: $(this).find('input[name="reason"]').val()
     };
@@ -58,11 +58,11 @@
         $fb.text(resp.data.msg).css('color','#2ecc71').show();
         setTimeout(function(){ window.location.reload(); }, 600);
       } else {
-        var msg = (resp && resp.data && resp.data.msg) || 'Error';
+        var msg = (resp && resp.data && resp.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
         $fb.text(msg).css('color','#e74c3c').show();
       }
     }).fail(function(){
-      $fb.text('Error').css('color','#e74c3c').show();
+      $fb.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color','#e74c3c').show();
     });
   });
 
@@ -70,15 +70,15 @@
   $(document).on('click', '#bkit-open-day', function(e){
     e.preventDefault();
 
-    if(!confirm('Diesen geschlossenen Tag entfernen (wieder öffnen)?')) return;
+    if(!confirm(OPEN_CALENDAR_KIT_ADMIN.confirm_reopen)) return;
 
     var $m  = $('#bkit-closedday-modal');
     var $fb = $m.find('.bkit-feedback');
     var date = $m.data('date') || $m.find('input[name="date"]').val();
 
     var data = {
-      action: 'bkit_mvp_delete_closed_day',
-      nonce:  BKIT_MVP_ADMIN.nonce,
+      action: 'okit_delete_closed_day',
+      nonce:  OPEN_CALENDAR_KIT_ADMIN.nonce,
       date:   date
     };
 
@@ -87,11 +87,11 @@
         $fb.text(resp.data.msg).css('color','#2ecc71').show();
         setTimeout(function(){ window.location.reload(); }, 600);
       } else {
-        var msg = (resp && resp.data && resp.data.msg) || 'Error';
+        var msg = (resp && resp.data && resp.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
         $fb.text(msg).css('color','#e74c3c').show();
       }
     }).fail(function(){
-      $fb.text('Error').css('color','#e74c3c').show();
+      $fb.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color','#e74c3c').show();
     });
   });
 

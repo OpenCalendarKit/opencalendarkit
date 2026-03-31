@@ -14,7 +14,7 @@
 
     $m.find('.bkit-closed-info').show();
     $m.find('.bkit-closed-date').text(datePretty || '');
-    $m.find('.bkit-closed-reason').text(reason ? ('Grund: ' + reason) : '');
+    $m.find('.bkit-closed-reason').text(reason ? (OPEN_CALENDAR_KIT.reason_label + ' ' + reason) : '');
 
     showModal();
   }
@@ -25,7 +25,7 @@ $(document).on('click', '.bkit-cell.day.closed.clickable', function () {
     var reason = $(this).data('reason') || '';
     var pretty;
     try {
-      pretty = new Date(date + 'T00:00:00').toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      pretty = new Date(date + 'T00:00:00').toLocaleDateString(OPEN_CALENDAR_KIT.locale || undefined, { year: 'numeric', month: 'long', day: 'numeric' });
     } catch (e) {
       pretty = date;
     }
@@ -47,20 +47,27 @@ $(document).on('click', '.bkit-cell.day.closed.clickable', function () {
     if (!href || href === '#') return;
 
     // Month aus Query ziehen
-    var m = href.match(/bk_month=([0-9]{4}-[0-9]{2})/);
+    var m = href.match(/okit_month=([0-9]{4}-[0-9]{2})/);
     var month = m ? m[1] : '';
     if (!month) return; // fallback: normaler Link
 
-    var $cal = $a.closest('[data-bkit-calendar]');
+    var $cal = $a.closest('[data-okit-calendar]');
     if (!$cal.length) return;
 
     e.preventDefault();
     $cal.addClass('is-loading');
 
-    $.post(BKIT_MVP.ajax_url, {
-      action: 'bkit_mvp_calendar_month',
-      nonce: BKIT_MVP.nonce,
-      month: month
+    var showLegend = $cal.attr('data-show-legend');
+    var weekStartsOn = $cal.attr('data-week-starts-on');
+    var maxWidth = $cal.attr('data-max-width');
+
+    $.post(OPEN_CALENDAR_KIT.ajax_url, {
+      action: 'okit_calendar_month',
+      nonce: OPEN_CALENDAR_KIT.nonce,
+      month: month,
+      show_legend: showLegend !== undefined ? String(showLegend) : '',
+      week_starts_on: weekStartsOn !== undefined ? String(weekStartsOn) : '',
+      max_width: maxWidth !== undefined ? String(maxWidth) : ''
     }, function (resp) {
       if (resp && resp.success && resp.data && resp.data.html) {
         $cal.replaceWith(resp.data.html);

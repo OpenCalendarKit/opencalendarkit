@@ -2,51 +2,65 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class BKIT_MVP_ClosedDays_Admin {
+    private static function get_month_title(DateTimeInterface $date, DateTimeZone $tz) {
+        if (function_exists('wp_date')) {
+            return wp_date('F Y', $date->getTimestamp(), $tz);
+        }
+
+        $local_date = new DateTime('@' . $date->getTimestamp());
+        $local_date->setTimezone($tz);
+
+        return $local_date->format('F Y');
+    }
 
     /* ====== CPT & Listen-Ansicht ====== */
     public static function register_cpt() {
-        $labels = [
-            'name'          => __('Closed Days', 'bookingkit-mvp'),
-            'singular_name' => __('Closed Day', 'bookingkit-mvp')
-        ];
+        OpenCalendarKit_I18n::with_locale(function () {
+            $labels = [
+                'name'          => __('Closed Days', 'open-calendar-kit'),
+                'singular_name' => __('Closed Day', 'open-calendar-kit')
+            ];
 
-        register_post_type('bk_closed_day', [
-            'labels'       => $labels,
-            'public'       => false,
-            'show_ui'      => true,
-            'menu_icon'    => 'dashicons-no-alt',
-            'supports'     => ['title'],
-            // Keep CPT for storage/queries, but hide it from the admin menu.
-            'show_in_menu' => false,
-        ]);
+            register_post_type('bk_closed_day', [
+                'labels'       => $labels,
+                'public'       => false,
+                'show_ui'      => true,
+                'menu_icon'    => 'dashicons-no-alt',
+                'supports'     => ['title'],
+                'show_in_menu' => false,
+            ]);
 
-        add_filter('manage_bk_closed_day_posts_columns', [__CLASS__, 'cols']);
-        add_action('manage_bk_closed_day_posts_custom_column', [__CLASS__, 'col_content'], 10, 2);
-        add_filter('manage_edit-bk_closed_day_sortable_columns', [__CLASS__, 'sortable']);
-        add_action('pre_get_posts', [__CLASS__, 'default_order']);
+            add_filter('manage_bk_closed_day_posts_columns', [__CLASS__, 'cols']);
+            add_action('manage_bk_closed_day_posts_custom_column', [__CLASS__, 'col_content'], 10, 2);
+            add_filter('manage_edit-bk_closed_day_sortable_columns', [__CLASS__, 'sortable']);
+            add_action('pre_get_posts', [__CLASS__, 'default_order']);
 
-        // AJAX speichern + löschen
-        add_action('wp_ajax_bkit_mvp_save_closed_day',    [__CLASS__, 'ajax_save']);
-        add_action('wp_ajax_bkit_mvp_delete_closed_day',  [__CLASS__, 'ajax_delete']);
+            add_action('wp_ajax_okit_save_closed_day',    [__CLASS__, 'ajax_save']);
+            add_action('wp_ajax_okit_delete_closed_day',  [__CLASS__, 'ajax_delete']);
+        });
     }
 
     public static function cols($cols){
-        $new = [];
-        $new['cb']         = $cols['cb'];
-        $new['title']      = __('Title');
-        $new['_bk_date']   = __('Date','bookingkit-mvp');
-        $new['_bk_reason'] = __('Reason','bookingkit-mvp');
-        $new['_edit']      = __('Actions','bookingkit-mvp');
-        return $new;
+        return OpenCalendarKit_I18n::with_locale(function () use ($cols) {
+            $new = [];
+            $new['cb']         = $cols['cb'];
+            $new['title']      = __('Title', 'open-calendar-kit');
+            $new['_bk_date']   = __('Date', 'open-calendar-kit');
+            $new['_bk_reason'] = __('Reason', 'open-calendar-kit');
+            $new['_edit']      = __('Actions', 'open-calendar-kit');
+            return $new;
+        });
     }
 
     public static function col_content($col, $post_id){
-        if ($col === '_bk_date')   { echo esc_html(get_post_meta($post_id, '_bk_date', true));   return; }
-        if ($col === '_bk_reason') { echo esc_html(get_post_meta($post_id, '_bk_reason', true)); return; }
-        if ($col === '_edit') {
-            $url = admin_url('post.php?post='.(int)$post_id.'&action=edit');
-            echo '<a class="button" href="'.esc_url($url).'">'.esc_html__('Edit','bookingkit-mvp').'</a>';
-        }
+        OpenCalendarKit_I18n::with_locale(function () use ($col, $post_id) {
+            if ($col === '_bk_date')   { echo esc_html(get_post_meta($post_id, '_bk_date', true));   return; }
+            if ($col === '_bk_reason') { echo esc_html(get_post_meta($post_id, '_bk_reason', true)); return; }
+            if ($col === '_edit') {
+                $url = admin_url('post.php?post='.(int)$post_id.'&action=edit');
+                echo '<a class="button" href="'.esc_url($url).'">'.esc_html__('Edit', 'open-calendar-kit').'</a>';
+            }
+        });
     }
 
     public static function sortable($cols){ $cols['_bk_date']='_bk_date'; return $cols; }
@@ -65,18 +79,22 @@ class BKIT_MVP_ClosedDays_Admin {
 
     /* ====== Metabox ====== */
     public static function register_metabox() {
-        add_meta_box('bk_closed_day_meta', __('Closed Day Details', 'bookingkit-mvp'), [__CLASS__, 'render_metabox'], 'bk_closed_day', 'normal', 'default');
+        OpenCalendarKit_I18n::with_locale(function () {
+            add_meta_box('bk_closed_day_meta', __('Closed Day Details', 'open-calendar-kit'), [__CLASS__, 'render_metabox'], 'bk_closed_day', 'normal', 'default');
+        });
     }
 
     public static function render_metabox($post) {
-        wp_nonce_field('bk_closed_day_meta', 'bk_closed_day_meta_nonce');
-        $date   = get_post_meta($post->ID, '_bk_date', true);
-        $reason = get_post_meta($post->ID, '_bk_reason', true); ?>
-        <p><label for="bk_date"><strong><?php esc_html_e('Date (YYYY-MM-DD)', 'bookingkit-mvp'); ?></strong></label><br/>
-        <input type="date" id="bk_date" name="bk_date" value="<?php echo esc_attr($date); ?>" /></p>
-        <p><label for="bk_reason"><strong><?php esc_html_e('Reason (optional)', 'bookingkit-mvp'); ?></strong></label><br/>
-        <input type="text" id="bk_reason" name="bk_reason" value="<?php echo esc_attr($reason); ?>" class="regular-text" /></p>
-        <?php
+        OpenCalendarKit_I18n::with_locale(function () use ($post) {
+            wp_nonce_field('bk_closed_day_meta', 'bk_closed_day_meta_nonce');
+            $date   = get_post_meta($post->ID, '_bk_date', true);
+            $reason = get_post_meta($post->ID, '_bk_reason', true); ?>
+            <p><label for="bk_date"><strong><?php esc_html_e('Date (YYYY-MM-DD)', 'open-calendar-kit'); ?></strong></label><br/>
+            <input type="date" id="bk_date" name="bk_date" value="<?php echo esc_attr($date); ?>" /></p>
+            <p><label for="bk_reason"><strong><?php esc_html_e('Reason (optional)', 'open-calendar-kit'); ?></strong></label><br/>
+            <input type="text" id="bk_reason" name="bk_reason" value="<?php echo esc_attr($reason); ?>" class="regular-text" /></p>
+            <?php
+        });
     }
 
     public static function save_metabox($post_id) {
@@ -90,7 +108,8 @@ class BKIT_MVP_ClosedDays_Admin {
         update_post_meta($post_id, '_bk_reason', $reason);
 
         if ( empty(get_the_title($post_id)) && $date ) {
-            wp_update_post(['ID'=>$post_id, 'post_title'=> sprintf(__('Closed: %s','bookingkit-mvp'), $date)]);
+            /* translators: %s is a closed-day date in YYYY-MM-DD format. */
+            wp_update_post(['ID'=>$post_id, 'post_title'=> sprintf(__('Closed: %s', 'open-calendar-kit'), $date)]);
         }
     }
 
@@ -137,22 +156,25 @@ class BKIT_MVP_ClosedDays_Admin {
     }
 
     public static function register_menu() {
-        add_submenu_page(
-            'calendarkit',
-            __('Calendar', 'bookingkit-mvp'),
-            __('Calendar', 'bookingkit-mvp'),
-            'calendarkit_manage',
-            'calendarkit_calendar',
-            [__CLASS__, 'render_admin_page']
-        );
+        OpenCalendarKit_I18n::with_locale(function () {
+            add_submenu_page(
+                OpenCalendarKit_Plugin::MENU_SLUG,
+                __('Calendar', 'open-calendar-kit'),
+                __('Calendar', 'open-calendar-kit'),
+                OpenCalendarKit_Plugin::CAP_MANAGE,
+                OpenCalendarKit_Plugin::PAGE_CALENDAR,
+                [__CLASS__, 'render_admin_page']
+            );
+        });
     }
 
     /* ====== Admin-Kalender ====== */
     public static function render_admin_page(){
+        OpenCalendarKit_I18n::with_locale(function () {
 
         $tz = new DateTimeZone( wp_timezone_string() );
-        $req_month = isset($_GET['bk_month']) ? sanitize_text_field($_GET['bk_month']) : '';
-        $d = $req_month ? DateTime::createFromFormat('Y-m', $req_month, $tz) : new DateTime('first day of this month', $tz);
+        $req_month = isset($_GET['okit_month']) ? sanitize_text_field($_GET['okit_month']) : '';
+        $d = $req_month ? DateTime::createFromFormat('!Y-m', $req_month, $tz) : new DateTime('first day of this month', $tz);
         if (!$d) $d = new DateTime('first day of this month', $tz);
 
         $year        = (int) $d->format('Y');
@@ -203,18 +225,18 @@ class BKIT_MVP_ClosedDays_Admin {
             ];
         }
 
-        echo '<div class="wrap"><h1>'.esc_html__('Calendar','bookingkit-mvp').'</h1>';
+        echo '<div class="wrap"><h1>'.esc_html__('Calendar', 'open-calendar-kit').'</h1>';
         echo '<div class="bkit-calendar bkit-admin-cal" style="max-width:380px;">';
 
         // Navigation
         $next = (clone $d)->modify('+1 month');
         $prev = (clone $d)->modify('-1 month');
-        $prev_q = esc_url( add_query_arg(['bk_month' => $prev->format('Y-m')]) );
-        $next_q = esc_url( add_query_arg(['bk_month' => $next->format('Y-m')]) );
+        $prev_q = esc_url( add_query_arg(['okit_month' => $prev->format('Y-m')]) );
+        $next_q = esc_url( add_query_arg(['okit_month' => $next->format('Y-m')]) );
 
         echo '<div class="bkit-cal-head">';
         echo '<a class="bkit-nav prev" href="'.$prev_q.'">‹</a>';
-        echo '<span class="bkit-cal-title">'.esc_html( date_i18n('F Y', $d->getTimestamp()) ).'</span>';
+        echo '<span class="bkit-cal-title">'.esc_html( self::get_month_title($d, $tz) ).'</span>';
         echo '<a class="bkit-nav next" href="'.$next_q.'">›</a>';
         echo '</div>';
 
@@ -249,24 +271,24 @@ class BKIT_MVP_ClosedDays_Admin {
         <div id="bkit-closedday-modal" class="bkit-modal" style="display:none;">
           <div class="bkit-modal-box">
             <div class="bkit-modal-head">
-              <span class="title"><?php esc_html_e('Set Closed Day','bookingkit-mvp'); ?></span>
-              <button type="button" class="bkit-close" aria-label="<?php esc_attr_e('Close','bookingkit-mvp'); ?>">×</button>
+              <span class="title"><?php esc_html_e('Set Closed Day', 'open-calendar-kit'); ?></span>
+              <button type="button" class="bkit-close" aria-label="<?php esc_attr_e('Close', 'open-calendar-kit'); ?>">×</button>
             </div>
             <form id="bkit-closedday-form">
               <div class="row">
-                <label><?php esc_html_e('Date','bookingkit-mvp'); ?></label>
+                <label><?php esc_html_e('Date', 'open-calendar-kit'); ?></label>
                 <input type="date" name="date" value="">
               </div>
               <div class="row">
-                <label><?php esc_html_e('Reason (optional)','bookingkit-mvp'); ?></label>
+                <label><?php esc_html_e('Reason (optional)', 'open-calendar-kit'); ?></label>
                 <input type="text" name="reason" value="">
               </div>
               <div class="actions">
-                <button type="submit" class="button button-primary"><?php esc_html_e('Save closed day','bookingkit-mvp'); ?></button>
+                <button type="submit" class="button button-primary"><?php esc_html_e('Save closed day', 'open-calendar-kit'); ?></button>
                 <button id="bkit-open-day" type="button" class="button" style="display:none;">
-                  <?php esc_html_e('Open day again','bookingkit-mvp'); ?>
+                  <?php esc_html_e('Open day again', 'open-calendar-kit'); ?>
                 </button>
-                <button id="bkit-cancel" type="button" class="button"><?php esc_html_e('Cancel','bookingkit-mvp'); ?></button>
+                <button id="bkit-cancel" type="button" class="button"><?php esc_html_e('Cancel', 'open-calendar-kit'); ?></button>
               </div>
               <div class="bkit-feedback" style="display:none;"></div>
             </form>
@@ -274,67 +296,74 @@ class BKIT_MVP_ClosedDays_Admin {
         </div>
         <?php
         echo '</div></div>';
+        });
     }
 
     /* ====== AJAX: Save ====== */
     public static function ajax_save() {
-        check_ajax_referer('bkit_mvp_admin','nonce');
+        OpenCalendarKit_I18n::with_locale(function () {
+            check_ajax_referer('okit_admin','nonce');
 
-        if ( ! current_user_can('calendarkit_manage') ) {
-            wp_send_json_error(['msg' => __('Not allowed','bookingkit-mvp')], 403);
-        }
-
-        $date   = sanitize_text_field($_POST['date'] ?? '');
-        $reason = sanitize_text_field($_POST['reason'] ?? '');
-
-        if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            wp_send_json_error(['msg'=>__('Invalid date','bookingkit-mvp')], 400);
-        }
-
-        $post_id = self::find_closed_day_post_id($date);
-
-        if ($post_id) {
-            update_post_meta($post_id, '_bk_reason', $reason);
-            if (empty(get_the_title($post_id))) {
-                wp_update_post(['ID'=>$post_id, 'post_title'=> sprintf(__('Closed: %s','bookingkit-mvp'), $date)]);
-            }
-            wp_send_json_success(['msg'=>__('Updated closed day','bookingkit-mvp')]);
-        } else {
-            $post_id = wp_insert_post([
-                'post_type'   => 'bk_closed_day',
-                'post_status' => 'publish',
-                'post_title'  => sprintf(__('Closed: %s','bookingkit-mvp'), $date),
-            ], true);
-
-            if (is_wp_error($post_id)) {
-                wp_send_json_error(['msg'=>$post_id->get_error_message()], 500);
+            if ( ! current_user_can(OpenCalendarKit_Plugin::CAP_MANAGE) ) {
+                wp_send_json_error(['msg' => __('Not allowed', 'open-calendar-kit')], 403);
             }
 
-            update_post_meta($post_id, '_bk_date', $date);
-            update_post_meta($post_id, '_bk_reason', $reason);
-            wp_send_json_success(['msg'=>__('Created closed day','bookingkit-mvp')]);
-        }
+            $date   = sanitize_text_field($_POST['date'] ?? '');
+            $reason = sanitize_text_field($_POST['reason'] ?? '');
+
+            if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
+            }
+
+            $post_id = self::find_closed_day_post_id($date);
+
+            if ($post_id) {
+                update_post_meta($post_id, '_bk_reason', $reason);
+                if (empty(get_the_title($post_id))) {
+                    /* translators: %s is a closed-day date in YYYY-MM-DD format. */
+                    wp_update_post(['ID'=>$post_id, 'post_title'=> sprintf(__('Closed: %s', 'open-calendar-kit'), $date)]);
+                }
+                wp_send_json_success(['msg' => __('Updated closed day', 'open-calendar-kit')]);
+            } else {
+                $post_id = wp_insert_post([
+                    'post_type'   => 'bk_closed_day',
+                    'post_status' => 'publish',
+                    /* translators: %s is a closed-day date in YYYY-MM-DD format. */
+                    'post_title'  => sprintf(__('Closed: %s', 'open-calendar-kit'), $date),
+                ], true);
+
+                if (is_wp_error($post_id)) {
+                    wp_send_json_error(['msg'=>$post_id->get_error_message()], 500);
+                }
+
+                update_post_meta($post_id, '_bk_date', $date);
+                update_post_meta($post_id, '_bk_reason', $reason);
+                wp_send_json_success(['msg' => __('Created closed day', 'open-calendar-kit')]);
+            }
+        });
     }
 
     /* ====== AJAX: Delete (Open again) ====== */
     public static function ajax_delete() {
-        check_ajax_referer('bkit_mvp_admin','nonce');
+        OpenCalendarKit_I18n::with_locale(function () {
+            check_ajax_referer('okit_admin','nonce');
 
-        if ( ! current_user_can('calendarkit_manage') ) {
-            wp_send_json_error(['msg' => __('Not allowed','bookingkit-mvp')], 403);
-        }
+            if ( ! current_user_can(OpenCalendarKit_Plugin::CAP_MANAGE) ) {
+                wp_send_json_error(['msg' => __('Not allowed', 'open-calendar-kit')], 403);
+            }
 
-        $date = sanitize_text_field($_POST['date'] ?? '');
-        if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
-            wp_send_json_error(['msg'=>__('Invalid date','bookingkit-mvp')], 400);
-        }
+            $date = sanitize_text_field($_POST['date'] ?? '');
+            if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
+            }
 
-        $post_id = self::find_closed_day_post_id($date);
-        if (!$post_id) {
-            wp_send_json_success(['msg'=>__('Day is already open','bookingkit-mvp')]);
-        }
+            $post_id = self::find_closed_day_post_id($date);
+            if (!$post_id) {
+                wp_send_json_success(['msg' => __('Day is already open', 'open-calendar-kit')]);
+            }
 
-        wp_delete_post($post_id, true);
-        wp_send_json_success(['msg'=>__('Closed day removed (open again)','bookingkit-mvp')]);
+            wp_delete_post($post_id, true);
+            wp_send_json_success(['msg' => __('Closed day removed (open again)', 'open-calendar-kit')]);
+        });
     }
 }
