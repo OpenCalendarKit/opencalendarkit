@@ -1,0 +1,353 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenCalendarKit 0.3.6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-31 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: open-calendar-kit\n"
+
+#: bootstrap.php
+msgid "Reason:"
+msgstr ""
+
+#: bootstrap.php
+msgid "Error"
+msgstr ""
+
+#: bootstrap.php
+msgid "Remove this closed day and mark it open again?"
+msgstr ""
+
+#: bootstrap.php
+msgid "Invalid month"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Plugin language"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Use WordPress language"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Use the website language by default, or choose a language for OpenCalendarKit only."
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Closed Days"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Closed Day"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Title"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Date"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Reason"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Actions"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Edit"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Closed Day Details"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Date (YYYY-MM-DD)"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Reason (optional)"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Closed: %s"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Calendar"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Set Closed Day"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Close"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Save closed day"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Open day again"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Cancel"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Not allowed"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Invalid date"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Updated closed day"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Created closed day"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Day is already open"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Closed day removed (open again)"
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Event Notice"
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Saved."
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Event announcement active"
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Show the event notice on the frontend when content is available."
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Event text"
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Use the shortcode [okit_event_notice] to output this content on the frontend."
+msgstr ""
+
+#: includes/Admin/EventNotice.php
+msgid "Save"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "OpenCalendarKit"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Monday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Tuesday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Wednesday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Thursday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Friday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Saturday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Sunday"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Opening Hours"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "Day"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+#: includes/Shortcodes/Calendar.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Closed"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "From"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "To"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "Note below opening hours"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "Optional note for visitors"
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "This text is shown below the opening hours on the frontend."
+msgstr ""
+
+#: includes/Admin/OpeningHours.php
+msgid "Use shortcodes: [okit_opening_hours], [okit_status_today], [okit_calendar]"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Settings"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Show status today by default"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Allow the status shortcode to output by default."
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Show calendar legend by default"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Display the open/closed legend below the calendar unless a shortcode overrides it."
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Week starts on"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Time format mode"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Use WordPress setting"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "24-hour"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "12-hour"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Show opening hours title by default"
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Display the heading above opening hours unless a shortcode overrides it."
+msgstr ""
+
+#: includes/Admin/Settings.php
+msgid "Save settings"
+msgstr ""
+
+#: includes/Shortcodes/Calendar.php
+msgid "Previous month"
+msgstr ""
+
+#: includes/Shortcodes/Calendar.php
+msgid "Next month"
+msgstr ""
+
+#: includes/Shortcodes/Calendar.php
+#: includes/Shortcodes/OpeningHours.php
+msgid "Open"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Mon"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Tue"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Wed"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Thu"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Fri"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Sat"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Sun"
+msgstr ""
+
+#: includes/Shortcodes/OpeningHours.php
+msgid "Open end"
+msgstr ""
+
+#: includes/Shortcodes/StatusToday.php
+msgid "Today closed"
+msgstr ""
+
+#: includes/Shortcodes/StatusToday.php
+msgid "Today open from %s"
+msgstr ""
+
+#: includes/Shortcodes/StatusToday.php
+msgid "Open now"
+msgstr ""
+
+#: includes/Shortcodes/StatusToday.php
+msgid "Today open until %s"
+msgstr ""

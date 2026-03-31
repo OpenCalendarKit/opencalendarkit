@@ -1,0 +1,255 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenCalendarKit 0.3.6\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Domain: open-calendar-kit\n"
+
+msgid "Use WordPress language"
+msgstr "Utiliser la langue de WordPress"
+
+msgid "Plugin language"
+msgstr "Langue de l’extension"
+
+msgid "Use the website language by default, or choose a language for OpenCalendarKit only."
+msgstr "Utilisez la langue du site par défaut ou choisissez une langue uniquement pour OpenCalendarKit."
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Show status today by default"
+msgstr "Afficher le statut du jour par défaut"
+
+msgid "Allow the status shortcode to output by default."
+msgstr "Autoriser l’affichage du shortcode de statut par défaut."
+
+msgid "Show calendar legend by default"
+msgstr "Afficher la légende du calendrier par défaut"
+
+msgid "Display the open/closed legend below the calendar unless a shortcode overrides it."
+msgstr "Afficher la légende ouvert/fermé sous le calendrier, sauf si un shortcode la remplace."
+
+msgid "Week starts on"
+msgstr "Début de semaine"
+
+msgid "Time format mode"
+msgstr "Format de l’heure"
+
+msgid "Use WordPress setting"
+msgstr "Utiliser le réglage WordPress"
+
+msgid "24-hour"
+msgstr "24 heures"
+
+msgid "12-hour"
+msgstr "12 heures"
+
+msgid "Show opening hours title by default"
+msgstr "Afficher le titre des horaires par défaut"
+
+msgid "Display the heading above opening hours unless a shortcode overrides it."
+msgstr "Afficher le titre au-dessus des horaires, sauf si un shortcode le remplace."
+
+msgid "Save settings"
+msgstr "Enregistrer les paramètres"
+
+msgid "OpenCalendarKit"
+msgstr "OpenCalendarKit"
+
+msgid "Opening Hours"
+msgstr "Horaires d'ouverture"
+
+msgid "Day"
+msgstr "Jour"
+
+msgid "Closed"
+msgstr "Fermé"
+
+msgid "From"
+msgstr "De"
+
+msgid "To"
+msgstr "À"
+
+msgid "Note below opening hours"
+msgstr "Note sous les horaires"
+
+msgid "Optional note for visitors"
+msgstr "Note facultative pour les visiteurs"
+
+msgid "This text is shown below the opening hours on the frontend."
+msgstr "Ce texte s’affiche sous les horaires sur le site."
+
+msgid "Use shortcodes: [okit_opening_hours], [okit_status_today], [okit_calendar]"
+msgstr "Utiliser les shortcodes : [okit_opening_hours], [okit_status_today], [okit_calendar]"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Saved."
+msgstr "Enregistré."
+
+msgid "Calendar"
+msgstr "Calendrier"
+
+msgid "Closed Days"
+msgstr "Jours fermés"
+
+msgid "Closed Day"
+msgstr "Jour fermé"
+
+msgid "Closed Day Details"
+msgstr "Détails du jour fermé"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Date (YYYY-MM-DD)"
+msgstr "Date (AAAA-MM-JJ)"
+
+msgid "Reason"
+msgstr "Raison"
+
+msgid "Reason (optional)"
+msgstr "Raison (facultative)"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "Set Closed Day"
+msgstr "Définir un jour fermé"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Save closed day"
+msgstr "Enregistrer le jour fermé"
+
+msgid "Open day again"
+msgstr "Rouvrir le jour"
+
+msgid "Not allowed"
+msgstr "Non autorisé"
+
+msgid "Invalid date"
+msgstr "Date invalide"
+
+msgid "Updated closed day"
+msgstr "Jour fermé mis à jour"
+
+msgid "Created closed day"
+msgstr "Jour fermé créé"
+
+msgid "Day is already open"
+msgstr "Le jour est déjà ouvert"
+
+msgid "Closed day removed (open again)"
+msgstr "Jour fermé supprimé (ouvert de nouveau)"
+
+msgid "Closed: %s"
+msgstr "Fermé : %s"
+
+msgid "Event Notice"
+msgstr "Avis d’événement"
+
+msgid "Event announcement active"
+msgstr "Avis d’événement actif"
+
+msgid "Show the event notice on the frontend when content is available."
+msgstr "Afficher l’avis d’événement sur le site lorsque du contenu est disponible."
+
+msgid "Event text"
+msgstr "Texte de l’avis"
+
+msgid "Use the shortcode [okit_event_notice] to output this content on the frontend."
+msgstr "Utilisez le shortcode [okit_event_notice] pour afficher ce contenu sur le site."
+
+msgid "Monday"
+msgstr "Lundi"
+
+msgid "Tuesday"
+msgstr "Mardi"
+
+msgid "Wednesday"
+msgstr "Mercredi"
+
+msgid "Thursday"
+msgstr "Jeudi"
+
+msgid "Friday"
+msgstr "Vendredi"
+
+msgid "Saturday"
+msgstr "Samedi"
+
+msgid "Sunday"
+msgstr "Dimanche"
+
+msgid "Mon"
+msgstr "Lun"
+
+msgid "Tue"
+msgstr "Mar"
+
+msgid "Wed"
+msgstr "Mer"
+
+msgid "Thu"
+msgstr "Jeu"
+
+msgid "Fri"
+msgstr "Ven"
+
+msgid "Sat"
+msgstr "Sam"
+
+msgid "Sun"
+msgstr "Dim"
+
+msgid "Open end"
+msgstr "Sans heure de fin"
+
+msgid "Today closed"
+msgstr "Fermé aujourd'hui"
+
+msgid "Today open from %s"
+msgstr "Ouvert aujourd'hui à partir de %s"
+
+msgid "Open now"
+msgstr "Ouvert maintenant"
+
+msgid "Today open until %s"
+msgstr "Ouvert aujourd'hui jusqu'à %s"
+
+msgid "Previous month"
+msgstr "Mois précédent"
+
+msgid "Next month"
+msgstr "Mois suivant"
+
+msgid "Open"
+msgstr "Ouvert"
+
+msgid "Reason:"
+msgstr "Raison :"
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Remove this closed day and mark it open again?"
+msgstr "Supprimer ce jour fermé et le marquer de nouveau comme ouvert ?"
+
+msgid "Invalid month"
+msgstr "Mois invalide"
