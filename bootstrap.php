@@ -167,16 +167,16 @@ class OpenCalendarKit_Plugin {
         OpenCalendarKit_I18n::with_locale(function () {
             check_ajax_referer('okit_frontend', 'nonce');
 
-            $month = sanitize_text_field($_POST['month'] ?? ''); // YYYY-MM
+            $month = isset($_POST['month']) ? sanitize_text_field(wp_unslash($_POST['month'])) : ''; // YYYY-MM
             if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
                 wp_send_json_error(['msg' => __('Invalid month', 'open-calendar-kit')], 400);
             }
 
             $html = '';
             if (class_exists('BKIT_MVP_Shortcode_Calendar')) {
-                $show_legend = sanitize_text_field($_POST['show_legend'] ?? '');
-                $week_starts_on = sanitize_text_field($_POST['week_starts_on'] ?? '');
-                $max_width = sanitize_text_field($_POST['max_width'] ?? '');
+                $show_legend = isset($_POST['show_legend']) ? sanitize_text_field(wp_unslash($_POST['show_legend'])) : '';
+                $week_starts_on = isset($_POST['week_starts_on']) ? sanitize_text_field(wp_unslash($_POST['week_starts_on'])) : '';
+                $max_width = isset($_POST['max_width']) ? sanitize_text_field(wp_unslash($_POST['max_width'])) : '';
 
                 $html = BKIT_MVP_Shortcode_Calendar::render([
                     'month'          => $month,

@@ -40,17 +40,21 @@ class BKIT_MVP_OpeningHours_Admin {
 
     public static function render_opening_hours_page() {
         OpenCalendarKit_I18n::with_locale(function () {
-            if ( isset($_POST['bkit_hours_nonce']) && wp_verify_nonce($_POST['bkit_hours_nonce'], 'save_bkit_hours') ) {
+            $nonce = isset($_POST['bkit_hours_nonce'])
+                ? sanitize_text_field(wp_unslash($_POST['bkit_hours_nonce']))
+                : '';
+
+            if ( $nonce && wp_verify_nonce($nonce, 'save_bkit_hours') && current_user_can(OpenCalendarKit_Plugin::CAP_MANAGE) ) {
                 $hours = [];
                 for ($d = 1; $d <= 7; $d++) {
                     $hours[$d] = [
                         'closed' => isset($_POST["day{$d}_closed"]) ? 1 : 0,
-                        'from'   => sanitize_text_field($_POST["day{$d}_from"] ?? ''),
-                        'to'     => sanitize_text_field($_POST["day{$d}_to"] ?? ''),
+                        'from'   => isset($_POST["day{$d}_from"]) ? sanitize_text_field(wp_unslash($_POST["day{$d}_from"])) : '',
+                        'to'     => isset($_POST["day{$d}_to"]) ? sanitize_text_field(wp_unslash($_POST["day{$d}_to"])) : '',
                     ];
                 }
 
-                $note = sanitize_textarea_field($_POST['bkit_opening_hours_note'] ?? '');
+                $note = isset($_POST['bkit_opening_hours_note']) ? sanitize_textarea_field(wp_unslash($_POST['bkit_opening_hours_note'])) : '';
 
                 update_option('bkit_mvp_opening_hours', $hours);
                 update_option('bkit_mvp_opening_hours_note', $note);
@@ -92,15 +96,15 @@ class BKIT_MVP_OpeningHours_Admin {
                                 <th scope="row"><?php echo esc_html($label); ?></th>
                                 <td>
                                     <label>
-                                        <input type="checkbox" name="day<?php echo $idx; ?>_closed" <?php checked(1, intval($row['closed'])); ?> />
+                                        <input type="checkbox" name="day<?php echo esc_attr((string) $idx); ?>_closed" <?php checked(1, intval($row['closed'])); ?> />
                                         <?php esc_html_e('Closed', 'open-calendar-kit'); ?>
                                     </label>
                                 </td>
                                 <td>
-                                    <input type="text" name="day<?php echo $idx; ?>_from" value="<?php echo esc_attr($row['from']); ?>" class="regular-text" />
+                                    <input type="text" name="day<?php echo esc_attr((string) $idx); ?>_from" value="<?php echo esc_attr($row['from']); ?>" class="regular-text" />
                                 </td>
                                 <td>
-                                    <input type="text" name="day<?php echo $idx; ?>_to" value="<?php echo esc_attr($row['to']); ?>" class="regular-text" />
+                                    <input type="text" name="day<?php echo esc_attr((string) $idx); ?>_to" value="<?php echo esc_attr($row['to']); ?>" class="regular-text" />
                                 </td>
                             </tr>
                         <?php endforeach; ?>

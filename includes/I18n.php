@@ -39,7 +39,7 @@ class OpenCalendarKit_I18n {
 
     public static function get_available_locales() {
         return [
-            self::SITE_DEFAULT => __( 'Use WordPress language', self::TEXT_DOMAIN ),
+            self::SITE_DEFAULT => __( 'Use WordPress language', 'open-calendar-kit' ),
             'de_DE'            => 'Deutsch',
             'en_US'            => 'English',
             'fr_FR'            => 'Français',
@@ -69,6 +69,7 @@ class OpenCalendarKit_I18n {
             unload_textdomain( self::TEXT_DOMAIN );
         }
 
+        // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Needed here because OpenCalendarKit supports a plugin-specific locale override and must reload its own textdomain when switching locales at runtime.
         return load_plugin_textdomain(
             self::TEXT_DOMAIN,
             false,

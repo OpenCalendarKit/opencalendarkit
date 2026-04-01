@@ -20,7 +20,7 @@ class BKIT_MVP_EventNotice_Admin {
         OpenCalendarKit_I18n::with_locale(function () {
             if (
                 isset($_POST['bkit_event_notice_nonce']) &&
-                wp_verify_nonce(wp_unslash($_POST['bkit_event_notice_nonce']), 'save_bkit_event_notice') &&
+                wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['bkit_event_notice_nonce'])), 'save_bkit_event_notice') &&
                 current_user_can(OpenCalendarKit_Plugin::CAP_MANAGE)
             ) {
                 $enabled = isset($_POST['bkit_mvp_event_notice_enabled']) ? '1' : '0';

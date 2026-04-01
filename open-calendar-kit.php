@@ -18,14 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/bootstrap.php';
 
-/**
- * Load translations for the public plugin shell.
- */
-function open_calendar_kit_load_textdomain() {
-	OpenCalendarKit_I18n::load_textdomain();
-}
-
-add_action( 'plugins_loaded', 'open_calendar_kit_load_textdomain' );
+add_action(
+	'plugins_loaded',
+	static function () {
+		OpenCalendarKit_I18n::load_textdomain();
+	}
+);
 
 new OpenCalendarKit_Plugin();
 

@@ -19,12 +19,14 @@ class BKIT_MVP_Shortcode_EventNotice {
                 return '';
             }
 
+            $content = wpautop(wp_kses_post($content));
+
             ob_start();
             ?>
             <div class="bkit-event-notice bkit-ui-callout bkit-ui-callout--notice" role="note">
                 <div class="bkit-ui-callout__inner bkit-event-notice__inner">
                     <div class="bkit-event-notice__body">
-                    <?php echo wpautop(wp_kses_post($content)); ?>
+                    <?php echo wp_kses_post($content); ?>
                     </div>
                 </div>
             </div>

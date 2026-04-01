@@ -98,12 +98,15 @@ class BKIT_MVP_ClosedDays_Admin {
     }
 
     public static function save_metabox($post_id) {
-        if ( !isset($_POST['bk_closed_day_meta_nonce']) || !wp_verify_nonce($_POST['bk_closed_day_meta_nonce'], 'bk_closed_day_meta')) return;
+        $nonce = isset($_POST['bk_closed_day_meta_nonce'])
+            ? sanitize_text_field(wp_unslash($_POST['bk_closed_day_meta_nonce']))
+            : '';
+        if ( ! $nonce || ! wp_verify_nonce($nonce, 'bk_closed_day_meta')) return;
         if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE ) return;
         if ( ! current_user_can('edit_post', $post_id) ) return;
 
-        $date   = sanitize_text_field($_POST['bk_date'] ?? '');
-        $reason = sanitize_text_field($_POST['bk_reason'] ?? '');
+        $date   = isset($_POST['bk_date']) ? sanitize_text_field(wp_unslash($_POST['bk_date'])) : '';
+        $reason = isset($_POST['bk_reason']) ? sanitize_text_field(wp_unslash($_POST['bk_reason'])) : '';
         update_post_meta($post_id, '_bk_date', $date);
         update_post_meta($post_id, '_bk_reason', $reason);
 
@@ -173,7 +176,8 @@ class BKIT_MVP_ClosedDays_Admin {
         OpenCalendarKit_I18n::with_locale(function () {
 
         $tz = new DateTimeZone( wp_timezone_string() );
-        $req_month = isset($_GET['okit_month']) ? sanitize_text_field($_GET['okit_month']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only month navigation in the admin calendar uses a validated month query parameter and does not change state.
+        $req_month = isset($_GET['okit_month']) ? sanitize_text_field(wp_unslash($_GET['okit_month'])) : '';
         $d = $req_month ? DateTime::createFromFormat('!Y-m', $req_month, $tz) : new DateTime('first day of this month', $tz);
         if (!$d) $d = new DateTime('first day of this month', $tz);
 
@@ -231,13 +235,13 @@ class BKIT_MVP_ClosedDays_Admin {
         // Navigation
         $next = (clone $d)->modify('+1 month');
         $prev = (clone $d)->modify('-1 month');
-        $prev_q = esc_url( add_query_arg(['okit_month' => $prev->format('Y-m')]) );
-        $next_q = esc_url( add_query_arg(['okit_month' => $next->format('Y-m')]) );
+        $prev_q = add_query_arg(['okit_month' => $prev->format('Y-m')]);
+        $next_q = add_query_arg(['okit_month' => $next->format('Y-m')]);
 
         echo '<div class="bkit-cal-head">';
-        echo '<a class="bkit-nav prev" href="'.$prev_q.'">‹</a>';
+        echo '<a class="bkit-nav prev" href="'.esc_url($prev_q).'">‹</a>';
         echo '<span class="bkit-cal-title">'.esc_html( self::get_month_title($d, $tz) ).'</span>';
-        echo '<a class="bkit-nav next" href="'.$next_q.'">›</a>';
+        echo '<a class="bkit-nav next" href="'.esc_url($next_q).'">›</a>';
         echo '</div>';
 
         echo '<div class="bkit-grid">';
@@ -250,17 +254,13 @@ class BKIT_MVP_ClosedDays_Admin {
 
         foreach ($cells as $c) {
             $classes = 'bkit-cell day ' . ($c['past'] ? 'past' : $c['state']);
-            $reasonAttr = $c['reason'] !== '' ? ' data-reason="'.esc_attr($c['reason']).'"' : '';
-            $closedEventAttr = ' data-closed-event="'.($c['closed_event'] ? '1' : '0').'"';
-            $closedRuleAttr  = ' data-closed-rule="'.($c['closed_rule'] ? '1' : '0').'"';
-
             printf(
                 '<button class="%s" data-date="%s"%s%s%s type="button"><span class="num">%d</span></button>',
                 esc_attr($classes),
                 esc_attr($c['date']),
-                $reasonAttr,
-                $closedEventAttr,
-                $closedRuleAttr,
+                $c['reason'] !== '' ? ' data-reason="' . esc_attr($c['reason']) . '"' : '',
+                ' data-closed-event="' . esc_attr($c['closed_event'] ? '1' : '0') . '"',
+                ' data-closed-rule="' . esc_attr($c['closed_rule'] ? '1' : '0') . '"',
                 (int)$c['day']
             );
         }
@@ -308,8 +308,8 @@ class BKIT_MVP_ClosedDays_Admin {
                 wp_send_json_error(['msg' => __('Not allowed', 'open-calendar-kit')], 403);
             }
 
-            $date   = sanitize_text_field($_POST['date'] ?? '');
-            $reason = sanitize_text_field($_POST['reason'] ?? '');
+            $date   = isset($_POST['date']) ? sanitize_text_field(wp_unslash($_POST['date'])) : '';
+            $reason = isset($_POST['reason']) ? sanitize_text_field(wp_unslash($_POST['reason'])) : '';
 
             if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
                 wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
@@ -352,7 +352,7 @@ class BKIT_MVP_ClosedDays_Admin {
                 wp_send_json_error(['msg' => __('Not allowed', 'open-calendar-kit')], 403);
             }
 
-            $date = sanitize_text_field($_POST['date'] ?? '');
+            $date = isset($_POST['date']) ? sanitize_text_field(wp_unslash($_POST['date'])) : '';
             if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
                 wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
             }

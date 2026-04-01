@@ -52,7 +52,8 @@ class BKIT_MVP_Shortcode_Calendar {
                 BKIT_MVP_Settings::is_enabled('show_calendar_legend')
             );
 
-            $req_month = isset($_GET['okit_month']) ? sanitize_text_field($_GET['okit_month']) : '';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public month navigation is a read-only view parameter and is validated against YYYY-MM before use.
+            $req_month = isset($_GET['okit_month']) ? sanitize_text_field(wp_unslash($_GET['okit_month'])) : '';
             if (!empty($req_month)) {
                 $atts['month'] = $req_month;
             }
@@ -131,15 +132,15 @@ class BKIT_MVP_Shortcode_Calendar {
             $prev = (clone $d)->modify('-1 month');
 
             $prev_allowed = ($prev >= $curFirst);
-            $prev_q = esc_url( add_query_arg(['okit_month' => $prev->format('Y-m')]) );
-            $next_q = esc_url( add_query_arg(['okit_month' => $next->format('Y-m')]) );
+            $prev_q = add_query_arg(['okit_month' => $prev->format('Y-m')]);
+            $next_q = add_query_arg(['okit_month' => $next->format('Y-m')]);
             ?>
             <div class="bkit-cal-head">
                 <a class="bkit-nav prev<?php echo $prev_allowed ? '' : ' disabled'; ?>"
-                   href="<?php echo $prev_allowed ? $prev_q : '#'; ?>"
+                   href="<?php echo $prev_allowed ? esc_url($prev_q) : '#'; ?>"
                    aria-label="<?php echo esc_attr__('Previous month', 'open-calendar-kit'); ?>">‹</a>
                 <span class="bkit-cal-title"><?php echo esc_html( self::get_month_title($d, $tz) ); ?></span>
-                <a class="bkit-nav next" href="<?php echo $next_q; ?>"
+                <a class="bkit-nav next" href="<?php echo esc_url($next_q); ?>"
                    aria-label="<?php echo esc_attr__('Next month', 'open-calendar-kit'); ?>">›</a>
             </div>
 
@@ -173,12 +174,9 @@ class BKIT_MVP_Shortcode_Calendar {
             $isClickable = (!$c['past'] && $c['state'] === 'closed');
 
             // Reason für geschlossene Tage mitgeben
-            $reasonAttr = '';
+            $reason = '';
             if ($c['state'] === 'closed') {
                 $reason = BKIT_MVP_ClosedDays_Admin::get_reason($c['date']);
-                if ($reason !== '') {
-                    $reasonAttr = ' data-reason="' . esc_attr($reason) . '"';
-                }
             }
 
             $classes = 'bkit-cell day ' . ($c['past'] ? 'past disabled' : $c['state']) . ($isClickable ? ' clickable' : '');
@@ -189,7 +187,7 @@ class BKIT_MVP_Shortcode_Calendar {
                 '<span class="num">%d</span></button>',
                 esc_attr($classes),
                 esc_attr($c['date']),
-                $reasonAttr,
+                $reason !== '' ? ' data-reason="' . esc_attr($reason) . '"' : '',
                 $c['past'] ? 'aria-disabled="true"' : '',
                 (int) $c['day']
             );
