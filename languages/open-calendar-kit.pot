@@ -341,7 +341,7 @@ msgid "Today closed"
 msgstr ""
 
 #: includes/Shortcodes/StatusToday.php
-msgid "Today open from %s"
+msgid "Opens today at %s"
 msgstr ""
 
 #: includes/Shortcodes/StatusToday.php
@@ -349,5 +349,9 @@ msgid "Open now"
 msgstr ""
 
 #: includes/Shortcodes/StatusToday.php
-msgid "Today open until %s"
+msgid "Open now until %s"
+msgstr ""
+
+#: includes/Shortcodes/StatusToday.php
+msgid "Closed now"
 msgstr ""

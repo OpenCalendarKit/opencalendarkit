@@ -224,14 +224,17 @@ msgstr "Sans heure de fin"
 msgid "Today closed"
 msgstr "Fermé aujourd'hui"
 
-msgid "Today open from %s"
-msgstr "Ouvert aujourd'hui à partir de %s"
+msgid "Opens today at %s"
+msgstr "Ouvre aujourd'hui à %s"
 
 msgid "Open now"
 msgstr "Ouvert maintenant"
 
-msgid "Today open until %s"
-msgstr "Ouvert aujourd'hui jusqu'à %s"
+msgid "Open now until %s"
+msgstr "Ouvert maintenant jusqu'à %s"
+
+msgid "Closed now"
+msgstr "Fermé maintenant"
 
 msgid "Previous month"
 msgstr "Mois précédent"
