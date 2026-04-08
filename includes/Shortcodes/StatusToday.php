@@ -49,13 +49,15 @@ class BKIT_MVP_Shortcode_StatusToday {
             $dow = intval($now->format('N'));
             $ymd = $now->format('Y-m-d');
             $closed_event = BKIT_MVP_ClosedDays_Admin::is_closed_on($ymd);
+            $open_override = BKIT_MVP_ClosedDays_Admin::is_open_exception_on($ymd);
             $hours = BKIT_MVP_OpeningHours_Admin::get_hours();
             $row = $hours[$dow] ?? ['closed' => 1, 'from' => '', 'to' => ''];
+            $is_rule_closed = !empty($row['closed']) && !$open_override;
 
             $label = __('Today closed', 'open-calendar-kit');
             $class = 'closed';
 
-            if (!$closed_event && empty($row['closed'])) {
+            if (!$closed_event && !$is_rule_closed) {
                 [$start, $end] = static::get_time_range_for_row($row, $tz, $now);
 
                 if (!$start) {

@@ -110,8 +110,9 @@ class BKIT_MVP_Shortcode_Calendar {
 
                 $closed_by_rule  = !empty($cfg['closed']);
                 $closed_by_event = BKIT_MVP_ClosedDays_Admin::is_closed_on($date);
+                $open_override   = BKIT_MVP_ClosedDays_Admin::is_open_exception_on($date);
 
-                $state = ($closed_by_rule || $closed_by_event) ? 'closed' : 'open';
+                $state = ($closed_by_event || ($closed_by_rule && !$open_override)) ? 'closed' : 'open';
                 $past  = ($date < $today);
 
                 $cells[] = ['day'=>$day, 'date'=>$date, 'state'=>$state, 'past'=>$past];

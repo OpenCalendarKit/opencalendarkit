@@ -26,6 +26,18 @@ msgid "Remove this closed day and mark it open again?"
 msgstr ""
 
 #: bootstrap.php
+msgid "Open day exceptionally"
+msgstr ""
+
+#: bootstrap.php
+msgid "Remove exceptional opening"
+msgstr ""
+
+#: bootstrap.php
+msgid "Remove this exceptional opening and use the normal weekday rule again?"
+msgstr ""
+
+#: bootstrap.php
 msgid "Invalid month"
 msgstr ""
 
@@ -106,6 +118,10 @@ msgid "Open day again"
 msgstr ""
 
 #: includes/Admin/ClosedDays.php
+msgid "Open exceptionally: %s"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
 msgid "Cancel"
 msgstr ""
 
@@ -131,6 +147,18 @@ msgstr ""
 
 #: includes/Admin/ClosedDays.php
 msgid "Closed day removed (open again)"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Exceptional opening saved"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Exceptional opening already removed"
+msgstr ""
+
+#: includes/Admin/ClosedDays.php
+msgid "Exceptional opening removed"
 msgstr ""
 
 #: includes/Admin/EventNotice.php

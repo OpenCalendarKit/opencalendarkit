@@ -140,6 +140,9 @@ msgstr "Schließtag speichern"
 msgid "Open day again"
 msgstr "Tag wieder öffnen"
 
+msgid "Open exceptionally: %s"
+msgstr "Ausnahmsweise geöffnet: %s"
+
 msgid "Not allowed"
 msgstr "Nicht erlaubt"
 
@@ -157,6 +160,15 @@ msgstr "Tag ist bereits offen"
 
 msgid "Closed day removed (open again)"
 msgstr "Schließtag entfernt (wieder offen)"
+
+msgid "Exceptional opening saved"
+msgstr "Ausnahme-Öffnung gespeichert"
+
+msgid "Exceptional opening already removed"
+msgstr "Ausnahme-Öffnung war bereits entfernt"
+
+msgid "Exceptional opening removed"
+msgstr "Ausnahme-Öffnung entfernt"
 
 msgid "Closed: %s"
 msgstr "Geschlossen: %s"
@@ -253,6 +265,15 @@ msgstr "Fehler"
 
 msgid "Remove this closed day and mark it open again?"
 msgstr "Diesen Schließtag entfernen und den Tag wieder als offen markieren?"
+
+msgid "Open day exceptionally"
+msgstr "Tag ausnahmsweise öffnen"
+
+msgid "Remove exceptional opening"
+msgstr "Ausnahme-Öffnung entfernen"
+
+msgid "Remove this exceptional opening and use the normal weekday rule again?"
+msgstr "Diese Ausnahme-Öffnung entfernen und wieder die normale Wochentagsregel verwenden?"
 
 msgid "Invalid month"
 msgstr "Ungültiger Monat"

@@ -2,6 +2,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class BKIT_MVP_ClosedDays_Admin {
+    private const STATE_CLOSED = 'closed';
+    private const STATE_OPEN = 'open';
+
     private static function get_month_title(DateTimeInterface $date, DateTimeZone $tz) {
         if (function_exists('wp_date')) {
             return wp_date('F Y', $date->getTimestamp(), $tz);
@@ -11,6 +14,20 @@ class BKIT_MVP_ClosedDays_Admin {
         $local_date->setTimezone($tz);
 
         return $local_date->format('F Y');
+    }
+
+    private static function normalize_exception_state($state): string {
+        return $state === self::STATE_OPEN ? self::STATE_OPEN : self::STATE_CLOSED;
+    }
+
+    private static function build_exception_title(string $date, string $state): string {
+        if ($state === self::STATE_OPEN) {
+            /* translators: %s is a date in YYYY-MM-DD format that is opened exceptionally. */
+            return sprintf(__('Open exceptionally: %s', 'open-calendar-kit'), $date);
+        }
+
+        /* translators: %s is a closed-day date in YYYY-MM-DD format. */
+        return sprintf(__('Closed: %s', 'open-calendar-kit'), $date);
     }
 
     /* ====== CPT & Listen-Ansicht ====== */
@@ -37,6 +54,8 @@ class BKIT_MVP_ClosedDays_Admin {
 
             add_action('wp_ajax_okit_save_closed_day',    [__CLASS__, 'ajax_save']);
             add_action('wp_ajax_okit_delete_closed_day',  [__CLASS__, 'ajax_delete']);
+            add_action('wp_ajax_okit_save_open_exception', [__CLASS__, 'ajax_save_open_exception']);
+            add_action('wp_ajax_okit_delete_open_exception', [__CLASS__, 'ajax_delete_open_exception']);
         });
     }
 
@@ -107,55 +126,59 @@ class BKIT_MVP_ClosedDays_Admin {
 
         $date   = isset($_POST['bk_date']) ? sanitize_text_field(wp_unslash($_POST['bk_date'])) : '';
         $reason = isset($_POST['bk_reason']) ? sanitize_text_field(wp_unslash($_POST['bk_reason'])) : '';
+        $state  = self::normalize_exception_state(get_post_meta($post_id, '_bk_state', true));
         update_post_meta($post_id, '_bk_date', $date);
         update_post_meta($post_id, '_bk_reason', $reason);
+        update_post_meta($post_id, '_bk_state', $state);
 
         if ( empty(get_the_title($post_id)) && $date ) {
-            /* translators: %s is a closed-day date in YYYY-MM-DD format. */
-            wp_update_post(['ID'=>$post_id, 'post_title'=> sprintf(__('Closed: %s', 'open-calendar-kit'), $date)]);
+            wp_update_post(['ID'=>$post_id, 'post_title'=> self::build_exception_title($date, $state)]);
         }
     }
 
     /* ====== Helper ====== */
-    public static function is_closed_on($ymd) {
+    private static function get_exception_post_ids($date): array {
         $q = new WP_Query([
             'post_type'      => 'bk_closed_day',
-            'posts_per_page' => 1,
+            'posts_per_page' => -1,
             'post_status'    => 'publish',
-            'meta_query'     => [[ 'key' => '_bk_date', 'value' => $ymd, 'compare' => '=' ]],
+            'fields'         => 'ids',
+            'meta_query'     => [[ 'key'=>'_bk_date','value'=>$date,'compare'=>'=' ]],
         ]);
-        $closed = $q->have_posts();
+
+        $ids = !empty($q->posts) ? array_map('intval', $q->posts) : [];
         wp_reset_postdata();
-        return $closed;
+        return $ids;
+    }
+
+    private static function find_exception_post_id($date, $state) {
+        $normalized_state = self::normalize_exception_state($state);
+
+        foreach (self::get_exception_post_ids($date) as $post_id) {
+            $post_state = self::normalize_exception_state(get_post_meta($post_id, '_bk_state', true));
+            if ($post_state === $normalized_state) {
+                return (int) $post_id;
+            }
+        }
+
+        return 0;
+    }
+
+    public static function is_closed_on($ymd) {
+        return self::find_exception_post_id((string) $ymd, self::STATE_CLOSED) > 0;
+    }
+
+    public static function is_open_exception_on($ymd) {
+        return self::find_exception_post_id((string) $ymd, self::STATE_OPEN) > 0;
     }
 
     public static function get_reason($ymd){
-        $q = new WP_Query([
-            'post_type'      => 'bk_closed_day',
-            'posts_per_page' => 1,
-            'post_status'    => 'publish',
-            'meta_query'     => [[ 'key' => '_bk_date', 'value' => $ymd, 'compare' => '=' ]],
-        ]);
-        $reason = '';
-        if ($q->have_posts()){
-            $post_id = $q->posts[0]->ID;
-            $reason  = (string) get_post_meta($post_id, '_bk_reason', true);
+        $post_id = self::find_exception_post_id((string) $ymd, self::STATE_CLOSED);
+        if (!$post_id) {
+            return '';
         }
-        wp_reset_postdata();
-        return trim($reason);
-    }
 
-    private static function find_closed_day_post_id($date) {
-        $q = new WP_Query([
-            'post_type'      => 'bk_closed_day',
-            'posts_per_page' => 1,
-            'post_status'    => 'publish',
-            'fields'         => 'ids',
-            'meta_query'     => [[ 'key'=>'_bk_date','value'=>$date,'compare'=>'=' ]]
-        ]);
-        $id = (!empty($q->posts) ? (int)$q->posts[0] : 0);
-        wp_reset_postdata();
-        return $id;
+        return trim((string) get_post_meta($post_id, '_bk_reason', true));
     }
 
     public static function register_menu() {
@@ -215,7 +238,8 @@ class BKIT_MVP_ClosedDays_Admin {
             $cfg = $getHoursRow($dowN);
             $closed_by_rule  = !empty($cfg['closed']);
             $closed_by_event = self::is_closed_on($date);
-            $state = ($closed_by_rule || $closed_by_event) ? 'closed' : 'open';
+            $open_override = self::is_open_exception_on($date);
+            $state = ($closed_by_event || ($closed_by_rule && !$open_override)) ? 'closed' : 'open';
             $past  = ($date < $today);
             $reason = $closed_by_event ? self::get_reason($date) : '';
             $cells[] = [
@@ -226,6 +250,7 @@ class BKIT_MVP_ClosedDays_Admin {
                 'reason'=>$reason,
                 'closed_event'=>$closed_by_event,
                 'closed_rule'=>$closed_by_rule,
+                'open_override'=>$open_override,
             ];
         }
 
@@ -261,6 +286,7 @@ class BKIT_MVP_ClosedDays_Admin {
                 $c['reason'] !== '' ? ' data-reason="' . esc_attr($c['reason']) . '"' : '',
                 ' data-closed-event="' . esc_attr($c['closed_event'] ? '1' : '0') . '"',
                 ' data-closed-rule="' . esc_attr($c['closed_rule'] ? '1' : '0') . '"',
+                ' data-open-override="' . esc_attr($c['open_override'] ? '1' : '0') . '"',
                 (int)$c['day']
             );
         }
@@ -288,6 +314,7 @@ class BKIT_MVP_ClosedDays_Admin {
                 <button id="bkit-open-day" type="button" class="button" style="display:none;">
                   <?php esc_html_e('Open day again', 'open-calendar-kit'); ?>
                 </button>
+                <button id="bkit-toggle-open-exception" type="button" class="button" style="display:none;"></button>
                 <button id="bkit-cancel" type="button" class="button"><?php esc_html_e('Cancel', 'open-calendar-kit'); ?></button>
               </div>
               <div class="bkit-feedback" style="display:none;"></div>
@@ -315,21 +342,24 @@ class BKIT_MVP_ClosedDays_Admin {
                 wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
             }
 
-            $post_id = self::find_closed_day_post_id($date);
+            $post_id = self::find_exception_post_id($date, self::STATE_CLOSED);
 
             if ($post_id) {
                 update_post_meta($post_id, '_bk_reason', $reason);
+                update_post_meta($post_id, '_bk_state', self::STATE_CLOSED);
                 if (empty(get_the_title($post_id))) {
-                    /* translators: %s is a closed-day date in YYYY-MM-DD format. */
-                    wp_update_post(['ID'=>$post_id, 'post_title'=> sprintf(__('Closed: %s', 'open-calendar-kit'), $date)]);
+                    wp_update_post(['ID'=>$post_id, 'post_title'=> self::build_exception_title($date, self::STATE_CLOSED)]);
+                }
+                $open_override_post_id = self::find_exception_post_id($date, self::STATE_OPEN);
+                if ($open_override_post_id) {
+                    wp_delete_post($open_override_post_id, true);
                 }
                 wp_send_json_success(['msg' => __('Updated closed day', 'open-calendar-kit')]);
             } else {
                 $post_id = wp_insert_post([
                     'post_type'   => 'bk_closed_day',
                     'post_status' => 'publish',
-                    /* translators: %s is a closed-day date in YYYY-MM-DD format. */
-                    'post_title'  => sprintf(__('Closed: %s', 'open-calendar-kit'), $date),
+                    'post_title'  => self::build_exception_title($date, self::STATE_CLOSED),
                 ], true);
 
                 if (is_wp_error($post_id)) {
@@ -338,6 +368,11 @@ class BKIT_MVP_ClosedDays_Admin {
 
                 update_post_meta($post_id, '_bk_date', $date);
                 update_post_meta($post_id, '_bk_reason', $reason);
+                update_post_meta($post_id, '_bk_state', self::STATE_CLOSED);
+                $open_override_post_id = self::find_exception_post_id($date, self::STATE_OPEN);
+                if ($open_override_post_id) {
+                    wp_delete_post($open_override_post_id, true);
+                }
                 wp_send_json_success(['msg' => __('Created closed day', 'open-calendar-kit')]);
             }
         });
@@ -357,13 +392,74 @@ class BKIT_MVP_ClosedDays_Admin {
                 wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
             }
 
-            $post_id = self::find_closed_day_post_id($date);
+            $post_id = self::find_exception_post_id($date, self::STATE_CLOSED);
             if (!$post_id) {
                 wp_send_json_success(['msg' => __('Day is already open', 'open-calendar-kit')]);
             }
 
             wp_delete_post($post_id, true);
             wp_send_json_success(['msg' => __('Closed day removed (open again)', 'open-calendar-kit')]);
+        });
+    }
+
+    public static function ajax_save_open_exception() {
+        OpenCalendarKit_I18n::with_locale(function () {
+            check_ajax_referer('okit_admin','nonce');
+
+            if ( ! current_user_can(OpenCalendarKit_Plugin::CAP_MANAGE) ) {
+                wp_send_json_error(['msg' => __('Not allowed', 'open-calendar-kit')], 403);
+            }
+
+            $date = isset($_POST['date']) ? sanitize_text_field(wp_unslash($_POST['date'])) : '';
+
+            if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
+            }
+
+            $post_id = self::find_exception_post_id($date, self::STATE_OPEN);
+
+            if ($post_id) {
+                update_post_meta($post_id, '_bk_state', self::STATE_OPEN);
+                wp_send_json_success(['msg' => __('Exceptional opening saved', 'open-calendar-kit')]);
+            }
+
+            $post_id = wp_insert_post([
+                'post_type'   => 'bk_closed_day',
+                'post_status' => 'publish',
+                'post_title'  => self::build_exception_title($date, self::STATE_OPEN),
+            ], true);
+
+            if (is_wp_error($post_id)) {
+                wp_send_json_error(['msg'=>$post_id->get_error_message()], 500);
+            }
+
+            update_post_meta($post_id, '_bk_date', $date);
+            update_post_meta($post_id, '_bk_reason', '');
+            update_post_meta($post_id, '_bk_state', self::STATE_OPEN);
+            wp_send_json_success(['msg' => __('Exceptional opening saved', 'open-calendar-kit')]);
+        });
+    }
+
+    public static function ajax_delete_open_exception() {
+        OpenCalendarKit_I18n::with_locale(function () {
+            check_ajax_referer('okit_admin','nonce');
+
+            if ( ! current_user_can(OpenCalendarKit_Plugin::CAP_MANAGE) ) {
+                wp_send_json_error(['msg' => __('Not allowed', 'open-calendar-kit')], 403);
+            }
+
+            $date = isset($_POST['date']) ? sanitize_text_field(wp_unslash($_POST['date'])) : '';
+            if (!$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                wp_send_json_error(['msg' => __('Invalid date', 'open-calendar-kit')], 400);
+            }
+
+            $post_id = self::find_exception_post_id($date, self::STATE_OPEN);
+            if (!$post_id) {
+                wp_send_json_success(['msg' => __('Exceptional opening already removed', 'open-calendar-kit')]);
+            }
+
+            wp_delete_post($post_id, true);
+            wp_send_json_success(['msg' => __('Exceptional opening removed', 'open-calendar-kit')]);
         });
     }
 }

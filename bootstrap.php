@@ -97,6 +97,9 @@ class OpenCalendarKit_Plugin {
                     'nonce'          => wp_create_nonce('okit_admin'),
                     'generic_error'  => __('Error', 'open-calendar-kit'),
                     'confirm_reopen' => __('Remove this closed day and mark it open again?', 'open-calendar-kit'),
+                    'open_day_exceptionally' => __('Open day exceptionally', 'open-calendar-kit'),
+                    'remove_exceptional_opening' => __('Remove exceptional opening', 'open-calendar-kit'),
+                    'confirm_remove_exceptional_opening' => __('Remove this exceptional opening and use the normal weekday rule again?', 'open-calendar-kit'),
                 ]);
             }
         });
