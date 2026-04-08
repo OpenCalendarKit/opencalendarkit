@@ -280,7 +280,7 @@ class BKIT_MVP_ClosedDays_Admin {
         foreach ($cells as $c) {
             $classes = 'bkit-cell day ' . ($c['past'] ? 'past' : $c['state']);
             printf(
-                '<button class="%s" data-date="%s"%s%s%s type="button"><span class="num">%d</span></button>',
+                '<button class="%s" data-date="%s"%s%s%s%s type="button"><span class="num">%d</span></button>',
                 esc_attr($classes),
                 esc_attr($c['date']),
                 $c['reason'] !== '' ? ' data-reason="' . esc_attr($c['reason']) . '"' : '',
