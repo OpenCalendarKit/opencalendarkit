@@ -108,6 +108,7 @@ class BKIT_MVP_ClosedDays_Admin {
             wp_nonce_field('bk_closed_day_meta', 'bk_closed_day_meta_nonce');
             $date   = get_post_meta($post->ID, '_bk_date', true);
             $reason = get_post_meta($post->ID, '_bk_reason', true); ?>
+            <input type="hidden" name="bk_state" value="<?php echo esc_attr(self::normalize_exception_state(get_post_meta($post->ID, '_bk_state', true))); ?>" />
             <p><label for="bk_date"><strong><?php esc_html_e('Date (YYYY-MM-DD)', 'open-calendar-kit'); ?></strong></label><br/>
             <input type="date" id="bk_date" name="bk_date" value="<?php echo esc_attr($date); ?>" /></p>
             <p><label for="bk_reason"><strong><?php esc_html_e('Reason (optional)', 'open-calendar-kit'); ?></strong></label><br/>
@@ -126,7 +127,7 @@ class BKIT_MVP_ClosedDays_Admin {
 
         $date   = isset($_POST['bk_date']) ? sanitize_text_field(wp_unslash($_POST['bk_date'])) : '';
         $reason = isset($_POST['bk_reason']) ? sanitize_text_field(wp_unslash($_POST['bk_reason'])) : '';
-        $state  = self::normalize_exception_state(get_post_meta($post_id, '_bk_state', true));
+        $state  = isset($_POST['bk_state']) ? self::normalize_exception_state(sanitize_text_field(wp_unslash($_POST['bk_state']))) : self::normalize_exception_state(get_post_meta($post_id, '_bk_state', true));
         update_post_meta($post_id, '_bk_date', $date);
         update_post_meta($post_id, '_bk_reason', $reason);
         update_post_meta($post_id, '_bk_state', $state);
@@ -427,6 +428,7 @@ class BKIT_MVP_ClosedDays_Admin {
 
             if ($post_id) {
                 update_post_meta($post_id, '_bk_state', self::STATE_OPEN);
+                update_post_meta($post_id, '_bk_reason', '');
                 self::delete_exception_post($date, self::STATE_CLOSED);
                 wp_send_json_success(['msg' => __('Exceptional opening saved', 'open-calendar-kit')]);
             }
