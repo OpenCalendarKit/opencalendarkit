@@ -79,8 +79,12 @@ class OpenCalendarKit_Plugin {
     }
 
     public function enqueue_admin_assets($hook) {
+        $current_page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
         $is_closed_days_cpt = in_array(get_post_type(), ['bk_closed_day'], true);
-        $is_calendar_page = (strpos($hook, 'open-calendar-kit_page_open-calendar-kit-calendar') !== false);
+        $is_calendar_page = (
+            strpos((string) $hook, self::PAGE_CALENDAR) !== false ||
+            $current_page === self::PAGE_CALENDAR
+        );
 
         OpenCalendarKit_I18n::with_locale(function () use ($hook, $is_closed_days_cpt, $is_calendar_page) {
             if (strpos($hook, 'open-calendar-kit') !== false || $is_closed_days_cpt || $is_calendar_page) {
