@@ -164,6 +164,13 @@ class BKIT_MVP_ClosedDays_Admin {
         return 0;
     }
 
+    private static function delete_exception_post($date, $state): void {
+        $post_id = self::find_exception_post_id($date, $state);
+        if ($post_id) {
+            wp_delete_post($post_id, true);
+        }
+    }
+
     public static function is_closed_on($ymd) {
         return self::find_exception_post_id((string) $ymd, self::STATE_CLOSED) > 0;
     }
@@ -420,6 +427,7 @@ class BKIT_MVP_ClosedDays_Admin {
 
             if ($post_id) {
                 update_post_meta($post_id, '_bk_state', self::STATE_OPEN);
+                self::delete_exception_post($date, self::STATE_CLOSED);
                 wp_send_json_success(['msg' => __('Exceptional opening saved', 'open-calendar-kit')]);
             }
 
@@ -436,6 +444,7 @@ class BKIT_MVP_ClosedDays_Admin {
             update_post_meta($post_id, '_bk_date', $date);
             update_post_meta($post_id, '_bk_reason', '');
             update_post_meta($post_id, '_bk_state', self::STATE_OPEN);
+            self::delete_exception_post($date, self::STATE_CLOSED);
             wp_send_json_success(['msg' => __('Exceptional opening saved', 'open-calendar-kit')]);
         });
     }

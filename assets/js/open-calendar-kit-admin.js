@@ -13,14 +13,15 @@
     $m.find('input[name="reason"]').val(reason || '');
     $m.find('.bkit-feedback').hide().text('');
 
-    // "Open day" nur anbieten, wenn der Tag wegen Event geschlossen ist (nicht wegen Regel)
+    // "Open day" nur anbieten, wenn der Tag nur wegen Event geschlossen ist.
     if (closedEvent && !closedRule) {
       $('#bkit-open-day').show();
     } else {
       $('#bkit-open-day').hide();
     }
 
-    if (closedRule && !closedEvent) {
+    // Regel-geschlossene Tage koennen immer eine Ausnahme-Oeffnung bekommen.
+    if (closedRule) {
       $openExceptionButton
         .text(openOverride ? OPEN_CALENDAR_KIT_ADMIN.remove_exceptional_opening : OPEN_CALENDAR_KIT_ADMIN.open_day_exceptionally)
         .show();
