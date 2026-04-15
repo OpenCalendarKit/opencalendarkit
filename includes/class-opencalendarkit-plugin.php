@@ -18,7 +18,7 @@ if ( ! defined( 'OPEN_CALENDAR_KIT_URL' ) ) {
 }
 
 if ( ! defined( 'OPEN_CALENDAR_KIT_VERSION' ) ) {
-	define( 'OPEN_CALENDAR_KIT_VERSION', '0.3.6' );
+	define( 'OPEN_CALENDAR_KIT_VERSION', '1.0.3' );
 }
 
 if ( ! defined( 'OPEN_CALENDAR_KIT_MAIN_FILE' ) ) {
@@ -83,7 +83,7 @@ class OpenCalendarKit_Plugin {
 	const NONCE_EVENT_NOTICE    = 'openkit_save_event_notice';
 	const NONCE_CLOSED_DAY_META = 'openkit_closed_day_meta';
 
-	const DATA_VERSION = '0.3.6-review-1';
+	const DATA_VERSION = '1.0.3-review-1';
 
 	/**
 	 * Register runtime hooks.

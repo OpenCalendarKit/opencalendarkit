@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenCalendarKit 0.3.6\n"
+"Project-Id-Version: OpenCalendarKit 1.0.3\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

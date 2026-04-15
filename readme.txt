@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.3.6
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,12 +91,9 @@ No. The uninstall behavior is intentionally data-friendly and does not delete ma
 
 == Changelog ==
 
-= 0.3.6 =
+= 1.0.3 =
 
-* Public plugin shell completed for OpenCalendarKit
-* Public `openkit_*` shortcode API established
-* Reservation legacy removed from the public plugin scope
-* Visible UI prepared for translation and localization
-* Central Public 1.0 display settings added
-* Initial automated test foundation added
-* Distribution and packaging documentation prepared
+* Standardized the public documentation on the `openkit_*` shortcodes
+* Brought the codebase in line with WordPress Coding Standards
+* Passed local Plugin Check without findings
+* Finalized release packaging for production installs and WordPress.org submission

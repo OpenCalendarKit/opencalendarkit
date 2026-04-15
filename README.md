@@ -116,7 +116,7 @@ Distribution package should include:
 - `readme.txt`
 - `LICENSE`
 
-Distribution package should not include development leftovers such as nested `.git` data. The plugin-level `.distignore` marks files that should stay out of a release archive.
+Distribution package should not include development leftovers such as nested `.git` data. The plugin-level `distignore.txt` marks files that should stay out of a release archive.
 
 ## License
 
