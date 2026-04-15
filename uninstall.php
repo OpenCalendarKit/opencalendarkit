@@ -1,5 +1,15 @@
 <?php
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit;
+/**
+ * Uninstall routine placeholder.
+ *
+ * Plugin data is intentionally retained after uninstall.
+ *
+ * @package OpenCalendarKit
+ */
+
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit;
+}
 
 /**
  * Benutzerdaten bewusst NICHT löschen.

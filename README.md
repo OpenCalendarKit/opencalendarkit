@@ -108,7 +108,7 @@ For a release ZIP, package only the contents of `open-calendar-kit/` as the top-
 Distribution package should include:
 
 - `open-calendar-kit.php`
-- `bootstrap.php`
+- `includes/class-opencalendarkit-plugin.php`
 - `uninstall.php`
 - `assets/`
 - `includes/`

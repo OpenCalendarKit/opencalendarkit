@@ -10,15 +10,17 @@
  * Requires PHP: 7.4
  * Text Domain: open-calendar-kit
  * Domain Path: /languages
+ *
+ * @package OpenCalendarKit
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/includes/class-opencalendarkit-plugin.php';
 
 new OpenCalendarKit_Plugin();
 
-register_activation_hook( __FILE__, [ 'OpenCalendarKit_Plugin', 'activate' ] );
-register_uninstall_hook( __FILE__, [ 'OpenCalendarKit_Plugin', 'uninstall' ] );
+register_activation_hook( __FILE__, array( 'OpenCalendarKit_Plugin', 'activate' ) );
+register_uninstall_hook( __FILE__, array( 'OpenCalendarKit_Plugin', 'uninstall' ) );
