@@ -1,8 +1,6 @@
 # Changelog
 
-## 1.0.3
+## 1.0.4
 
-- Standardized the public documentation on the `openkit_*` shortcode API.
-- Brought the codebase in line with WordPress Coding Standards.
-- Cleared local Plugin Check validation without findings.
-- Finalized release packaging for production installs and WordPress.org submission.
+- Renamed plugin constants to use a clearer plugin-specific prefix.
+- Cleared the remaining Plugin Check warning from the WordPress Playground review flow.

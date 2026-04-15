@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,9 +91,7 @@ No. The uninstall behavior is intentionally data-friendly and does not delete ma
 
 == Changelog ==
 
-= 1.0.3 =
+= 1.0.4 =
 
-* Standardized the public documentation on the `openkit_*` shortcodes
-* Brought the codebase in line with WordPress Coding Standards
-* Passed local Plugin Check without findings
-* Finalized release packaging for production installs and WordPress.org submission
+* Renamed plugin constants to use a clearer plugin-specific prefix
+* Cleared the remaining Plugin Check warning from the WordPress Playground review flow
