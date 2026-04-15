@@ -1,5 +1,5 @@
 === OpenCalendarKit ===
-Contributors: replace-with-wordpress-org-slug
+Contributors: voigtjo
 Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
@@ -13,6 +13,15 @@ Public WordPress plugin for opening hours, closed days, monthly calendars, event
 == Description ==
 
 OpenCalendarKit provides a lightweight public plugin for recurring opening hours, closed days, a monthly calendar, an optional event notice, and an optional "status today" output.
+
+It is built for restaurants, cafes, shops, and other small businesses that want a simple and clear way to show:
+
+* opening hours
+* whether they are open right now
+* special closed days
+* a current notice or announcement
+
+Unlike large event or booking plugins, OpenCalendarKit focuses on business visibility, not on tickets, appointments, or complex reservation workflows.
 
 The current Public 1.0 scope includes:
 
@@ -33,10 +42,10 @@ The current Public 1.0 scope does not include:
 
 Available shortcodes:
 
-* `[okit_opening_hours]`
-* `[okit_status_today]`
-* `[okit_calendar]`
-* `[okit_event_notice]`
+* `[openkit_opening_hours]`
+* `[openkit_status_today]`
+* `[openkit_calendar]`
+* `[openkit_event_notice]`
 
 == Installation ==
 
@@ -44,7 +53,7 @@ Available shortcodes:
 2. Activate **OpenCalendarKit** through the Plugins screen.
 3. Open **OpenCalendarKit** in the WordPress admin.
 4. Configure display settings, opening hours, closed days, and event notice.
-5. Insert the provided `okit_*` shortcodes into pages, posts, or widget areas.
+5. Insert the provided `openkit_*` shortcodes into pages, posts, or widget areas.
 
 == Frequently Asked Questions ==
 
@@ -85,7 +94,7 @@ No. The uninstall behavior is intentionally data-friendly and does not delete ma
 = 0.3.6 =
 
 * Public plugin shell completed for OpenCalendarKit
-* Public `okit_*` shortcode API established
+* Public `openkit_*` shortcode API established
 * Reservation legacy removed from the public plugin scope
 * Visible UI prepared for translation and localization
 * Central Public 1.0 display settings added

@@ -42,10 +42,10 @@ Recommended first setup order on a fresh test site:
 
 ## Shortcodes
 
-- `[okit_opening_hours]` renders the opening-hours table.
-- `[okit_status_today]` renders the optional status output for the current day.
-- `[okit_calendar]` renders the monthly calendar with closed days.
-- `[okit_event_notice]` renders the optional event notice.
+- `[openkit_opening_hours]` renders the opening-hours table.
+- `[openkit_status_today]` renders the optional status output for the current day.
+- `[openkit_calendar]` renders the monthly calendar with closed days.
+- `[openkit_event_notice]` renders the optional event notice.
 
 Shortcode attributes can explicitly override matching global settings where supported.
 

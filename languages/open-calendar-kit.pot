@@ -182,7 +182,7 @@ msgid "Event text"
 msgstr ""
 
 #: includes/Admin/EventNotice.php
-msgid "Use the shortcode [okit_event_notice] to output this content on the frontend."
+msgid "Use the shortcode [openkit_event_notice] to output this content on the frontend."
 msgstr ""
 
 #: includes/Admin/EventNotice.php
@@ -264,7 +264,7 @@ msgid "This text is shown below the opening hours on the frontend."
 msgstr ""
 
 #: includes/Admin/OpeningHours.php
-msgid "Use shortcodes: [okit_opening_hours], [okit_status_today], [okit_calendar]"
+msgid "Use shortcodes: [openkit_opening_hours], [openkit_status_today], [openkit_calendar]"
 msgstr ""
 
 #: includes/Admin/Settings.php

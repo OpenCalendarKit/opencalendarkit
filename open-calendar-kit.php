@@ -18,13 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/bootstrap.php';
 
-add_action(
-	'plugins_loaded',
-	static function () {
-		OpenCalendarKit_I18n::load_textdomain();
-	}
-);
-
 new OpenCalendarKit_Plugin();
 
 register_activation_hook( __FILE__, [ 'OpenCalendarKit_Plugin', 'activate' ] );

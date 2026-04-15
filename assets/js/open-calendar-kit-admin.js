@@ -1,26 +1,23 @@
-(function($){
-
-  function openModal(dateISO, reason, closedEvent, closedRule, openOverride){
-    var $m = $('#bkit-closedday-modal');
+(function ($) {
+  function openModal(dateISO, reason, closedEvent, closedRule, openOverride) {
+    var $modal = $('#bkit-closedday-modal');
     var $openExceptionButton = $('#bkit-toggle-open-exception');
 
-    $m.data('date', dateISO || '');
-    $m.data('closedEvent', closedEvent ? 1 : 0);
-    $m.data('closedRule', closedRule ? 1 : 0);
-    $m.data('openOverride', openOverride ? 1 : 0);
+    $modal.data('date', dateISO || '');
+    $modal.data('closedEvent', closedEvent ? 1 : 0);
+    $modal.data('closedRule', closedRule ? 1 : 0);
+    $modal.data('openOverride', openOverride ? 1 : 0);
 
-    $m.find('input[name="date"]').val(dateISO || '');
-    $m.find('input[name="reason"]').val(reason || '');
-    $m.find('.bkit-feedback').hide().text('');
+    $modal.find('input[name="date"]').val(dateISO || '');
+    $modal.find('input[name="reason"]').val(reason || '');
+    $modal.find('.bkit-feedback').hide().text('');
 
-    // "Open day" nur anbieten, wenn der Tag nur wegen Event geschlossen ist.
     if (closedEvent && !closedRule) {
       $('#bkit-open-day').show();
     } else {
       $('#bkit-open-day').hide();
     }
 
-    // Regel-geschlossene Tage koennen immer eine Ausnahme-Oeffnung bekommen.
     if (closedRule) {
       $openExceptionButton
         .text(openOverride ? OPEN_CALENDAR_KIT_ADMIN.remove_exceptional_opening : OPEN_CALENDAR_KIT_ADMIN.open_day_exceptionally)
@@ -29,113 +26,154 @@
       $openExceptionButton.hide().text('');
     }
 
-    $m.show().css('display','flex');
+    $modal.show().css('display', 'flex');
   }
 
-  function closeModal(){ $('#bkit-closedday-modal').hide(); }
+  function closeModal() {
+    $('#bkit-closedday-modal').hide();
+  }
 
-  // Klick im Admin-Kalender
-  $(document).on('click', '.bkit-admin-cal .bkit-cell.day', function(){
-    var date       = $(this).data('date') || '';
-    var reason     = $(this).data('reason') || '';
-    var closedEvent= String($(this).data('closedEvent') || '0') === '1';
-    var closedRule = String($(this).data('closedRule') || '0') === '1';
-    var openOverride = String($(this).data('openOverride') || '0') === '1';
-    if(!date) return;
-    openModal(String(date), String(reason), closedEvent, closedRule, openOverride);
-  });
-
-  // Modal schließen
-  $(document).on('click', '#bkit-closedday-modal .bkit-close, #bkit-cancel', function(e){
-    e.preventDefault();
-    closeModal();
-  });
-
-  // Speichern
-  $(document).on('submit', '#bkit-closedday-form', function(e){
-    e.preventDefault();
-
-    var $m  = $('#bkit-closedday-modal');
-    var $fb = $m.find('.bkit-feedback');
-
-    var data = {
-      action: 'okit_save_closed_day',
-      nonce:  OPEN_CALENDAR_KIT_ADMIN.nonce,
-      date:   $(this).find('input[name="date"]').val(),
-      reason: $(this).find('input[name="reason"]').val()
-    };
-
-    $.post(ajaxurl, data, function(resp){
-      if (resp && resp.success){
-        $fb.text(resp.data.msg).css('color','#2ecc71').show();
-        setTimeout(function(){ window.location.reload(); }, 600);
-      } else {
-        var msg = (resp && resp.data && resp.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
-        $fb.text(msg).css('color','#e74c3c').show();
-      }
-    }).fail(function(){
-      $fb.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color','#e74c3c').show();
-    });
-  });
-
-  // Öffnen (Closed Day löschen)
-  $(document).on('click', '#bkit-open-day', function(e){
-    e.preventDefault();
-
-    if(!confirm(OPEN_CALENDAR_KIT_ADMIN.confirm_reopen)) return;
-
-    var $m  = $('#bkit-closedday-modal');
-    var $fb = $m.find('.bkit-feedback');
-    var date = $m.data('date') || $m.find('input[name="date"]').val();
-
-    var data = {
-      action: 'okit_delete_closed_day',
-      nonce:  OPEN_CALENDAR_KIT_ADMIN.nonce,
-      date:   date
-    };
-
-    $.post(ajaxurl, data, function(resp){
-      if (resp && resp.success){
-        $fb.text(resp.data.msg).css('color','#2ecc71').show();
-        setTimeout(function(){ window.location.reload(); }, 600);
-      } else {
-        var msg = (resp && resp.data && resp.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
-        $fb.text(msg).css('color','#e74c3c').show();
-      }
-    }).fail(function(){
-      $fb.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color','#e74c3c').show();
-    });
-  });
-
-  $(document).on('click', '#bkit-toggle-open-exception', function(e){
-    e.preventDefault();
-
-    var $m  = $('#bkit-closedday-modal');
-    var $fb = $m.find('.bkit-feedback');
-    var date = $m.data('date') || $m.find('input[name="date"]').val();
-    var openOverride = String($m.data('openOverride') || '0') === '1';
-
-    if(openOverride && !confirm(OPEN_CALENDAR_KIT_ADMIN.confirm_remove_exceptional_opening)) {
+  function reloadAdminCalendar(month) {
+    var $root = $('[data-openkit-admin-calendar-root]');
+    if (!$root.length || !month) {
       return;
     }
 
-    var data = {
-      action: openOverride ? 'okit_delete_open_exception' : 'okit_save_open_exception',
-      nonce:  OPEN_CALENDAR_KIT_ADMIN.nonce,
-      date:   date
-    };
+    $root.addClass('is-loading');
 
-    $.post(ajaxurl, data, function(resp){
-      if (resp && resp.success){
-        $fb.text(resp.data.msg).css('color','#2ecc71').show();
-        setTimeout(function(){ window.location.reload(); }, 600);
-      } else {
-        var msg = (resp && resp.data && resp.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
-        $fb.text(msg).css('color','#e74c3c').show();
+    $.post(ajaxurl, {
+      action: OPEN_CALENDAR_KIT_ADMIN.action,
+      nonce: OPEN_CALENDAR_KIT_ADMIN.nonce,
+      month: month
+    }, function (response) {
+      if (response && response.success && response.data && response.data.html) {
+        $root.replaceWith(response.data.html);
       }
-    }).fail(function(){
-      $fb.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color','#e74c3c').show();
+    }).always(function () {
+      $('[data-openkit-admin-calendar-root].is-loading').removeClass('is-loading');
+    });
+  }
+
+  $(document).on('click', '.bkit-admin-cal .bkit-cell.day', function () {
+    var date = $(this).data('date') || '';
+    var reason = $(this).data('reason') || '';
+    var closedEvent = String($(this).data('closedEvent') || '0') === '1';
+    var closedRule = String($(this).data('closedRule') || '0') === '1';
+    var openOverride = String($(this).data('openOverride') || '0') === '1';
+
+    if (!date) {
+      return;
+    }
+
+    openModal(String(date), String(reason), closedEvent, closedRule, openOverride);
+  });
+
+  $(document).on('click', '#bkit-closedday-modal .bkit-close, #bkit-cancel', function (event) {
+    event.preventDefault();
+    closeModal();
+  });
+
+  $(document).on('click', '.bkit-admin-cal .bkit-nav', function (event) {
+    var month = String($(this).data('targetMonth') || '');
+    if (!month) {
+      return;
+    }
+
+    event.preventDefault();
+    reloadAdminCalendar(month);
+  });
+
+  $(document).on('submit', '#bkit-closedday-form', function (event) {
+    event.preventDefault();
+
+    var $modal = $('#bkit-closedday-modal');
+    var $feedback = $modal.find('.bkit-feedback');
+    var date = $(this).find('input[name="date"]').val();
+    var month = String(date || '').slice(0, 7);
+
+    $.post(ajaxurl, {
+      action: OPEN_CALENDAR_KIT_ADMIN.save_closed_day_action,
+      nonce: OPEN_CALENDAR_KIT_ADMIN.nonce,
+      date: date,
+      reason: $(this).find('input[name="reason"]').val()
+    }, function (response) {
+      if (response && response.success) {
+        $feedback.text(response.data.msg).css('color', '#2ecc71').show();
+        setTimeout(function () {
+          closeModal();
+          reloadAdminCalendar(month);
+        }, 300);
+      } else {
+        var message = (response && response.data && response.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
+        $feedback.text(message).css('color', '#e74c3c').show();
+      }
+    }).fail(function () {
+      $feedback.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color', '#e74c3c').show();
     });
   });
 
+  $(document).on('click', '#bkit-open-day', function (event) {
+    event.preventDefault();
+
+    if (!confirm(OPEN_CALENDAR_KIT_ADMIN.confirm_reopen)) {
+      return;
+    }
+
+    var $modal = $('#bkit-closedday-modal');
+    var $feedback = $modal.find('.bkit-feedback');
+    var date = String($modal.data('date') || $modal.find('input[name="date"]').val() || '');
+    var month = date.slice(0, 7);
+
+    $.post(ajaxurl, {
+      action: OPEN_CALENDAR_KIT_ADMIN.delete_closed_day_action,
+      nonce: OPEN_CALENDAR_KIT_ADMIN.nonce,
+      date: date
+    }, function (response) {
+      if (response && response.success) {
+        $feedback.text(response.data.msg).css('color', '#2ecc71').show();
+        setTimeout(function () {
+          closeModal();
+          reloadAdminCalendar(month);
+        }, 300);
+      } else {
+        var message = (response && response.data && response.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
+        $feedback.text(message).css('color', '#e74c3c').show();
+      }
+    }).fail(function () {
+      $feedback.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color', '#e74c3c').show();
+    });
+  });
+
+  $(document).on('click', '#bkit-toggle-open-exception', function (event) {
+    event.preventDefault();
+
+    var $modal = $('#bkit-closedday-modal');
+    var $feedback = $modal.find('.bkit-feedback');
+    var date = String($modal.data('date') || $modal.find('input[name="date"]').val() || '');
+    var month = date.slice(0, 7);
+    var openOverride = String($modal.data('openOverride') || '0') === '1';
+
+    if (openOverride && !confirm(OPEN_CALENDAR_KIT_ADMIN.confirm_remove_exceptional_opening)) {
+      return;
+    }
+
+    $.post(ajaxurl, {
+      action: openOverride ? OPEN_CALENDAR_KIT_ADMIN.delete_open_exception_action : OPEN_CALENDAR_KIT_ADMIN.save_open_exception_action,
+      nonce: OPEN_CALENDAR_KIT_ADMIN.nonce,
+      date: date
+    }, function (response) {
+      if (response && response.success) {
+        $feedback.text(response.data.msg).css('color', '#2ecc71').show();
+        setTimeout(function () {
+          closeModal();
+          reloadAdminCalendar(month);
+        }, 300);
+      } else {
+        var message = (response && response.data && response.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
+        $feedback.text(message).css('color', '#e74c3c').show();
+      }
+    }).fail(function () {
+      $feedback.text(OPEN_CALENDAR_KIT_ADMIN.generic_error).css('color', '#e74c3c').show();
+    });
+  });
 })(jQuery);

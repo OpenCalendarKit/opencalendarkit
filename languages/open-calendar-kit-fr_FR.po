@@ -83,8 +83,8 @@ msgstr "Note facultative pour les visiteurs"
 msgid "This text is shown below the opening hours on the frontend."
 msgstr "Ce texte s’affiche sous les horaires sur le site."
 
-msgid "Use shortcodes: [okit_opening_hours], [okit_status_today], [okit_calendar]"
-msgstr "Utiliser les shortcodes : [okit_opening_hours], [okit_status_today], [okit_calendar]"
+msgid "Use shortcodes: [openkit_opening_hours], [openkit_status_today], [openkit_calendar]"
+msgstr "Utiliser les shortcodes : [openkit_opening_hours], [openkit_status_today], [openkit_calendar]"
 
 msgid "Save"
 msgstr "Enregistrer"
@@ -185,8 +185,8 @@ msgstr "Afficher l’avis d’événement sur le site lorsque du contenu est dis
 msgid "Event text"
 msgstr "Texte de l’avis"
 
-msgid "Use the shortcode [okit_event_notice] to output this content on the frontend."
-msgstr "Utilisez le shortcode [okit_event_notice] pour afficher ce contenu sur le site."
+msgid "Use the shortcode [openkit_event_notice] to output this content on the frontend."
+msgstr "Utilisez le shortcode [openkit_event_notice] pour afficher ce contenu sur le site."
 
 msgid "Monday"
 msgstr "Lundi"

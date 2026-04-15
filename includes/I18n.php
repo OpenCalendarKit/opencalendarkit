@@ -1,6 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 class OpenCalendarKit_I18n {
@@ -47,8 +47,8 @@ class OpenCalendarKit_I18n {
     }
 
     public static function get_configured_locale() {
-        if ( class_exists( 'BKIT_MVP_Settings' ) ) {
-            return self::normalize_plugin_locale( BKIT_MVP_Settings::get( 'plugin_locale' ) );
+        if ( class_exists( 'OpenCalendarKit_Admin_Settings' ) ) {
+            return self::normalize_plugin_locale( OpenCalendarKit_Admin_Settings::get( 'plugin_locale' ) );
         }
 
         return self::SITE_DEFAULT;
@@ -64,19 +64,6 @@ class OpenCalendarKit_I18n {
         return str_replace( '_', '-', self::get_effective_locale() );
     }
 
-    public static function load_textdomain() {
-        if ( function_exists( 'unload_textdomain' ) ) {
-            unload_textdomain( self::TEXT_DOMAIN );
-        }
-
-        // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Needed here because OpenCalendarKit supports a plugin-specific locale override and must reload its own textdomain when switching locales at runtime.
-        return load_plugin_textdomain(
-            self::TEXT_DOMAIN,
-            false,
-            dirname( plugin_basename( OPEN_CALENDAR_KIT_MAIN_FILE ) ) . '/languages'
-        );
-    }
-
     public static function with_locale( callable $callback ) {
         $target_locale = self::get_effective_locale();
         $runtime_locale = self::get_runtime_locale();
@@ -89,7 +76,6 @@ class OpenCalendarKit_I18n {
             $target_locale !== $runtime_locale
         ) {
             $switched = (bool) switch_to_locale( $target_locale );
-            self::load_textdomain();
         }
 
         try {
@@ -97,7 +83,6 @@ class OpenCalendarKit_I18n {
         } finally {
             if ( $switched ) {
                 restore_previous_locale();
-                self::load_textdomain();
             }
         }
     }
