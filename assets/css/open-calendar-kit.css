@@ -25,8 +25,9 @@
   --okit-day-event-bg: var(--okit-color-event-soft);
   --okit-day-event-border: var(--okit-color-event-border);
   --okit-day-event-text: var(--okit-color-event-text);
-  --okit-event-callout-bg: var(--okit-color-event);
-  --okit-event-callout-text: var(--okit-color-event-strong-text);
+  --okit-event-callout-bg: var(--okit-color-event-soft);
+  --okit-event-callout-border: var(--okit-color-event-border);
+  --okit-event-callout-text: var(--okit-color-event-text);
 
   --okit-notice-bg: #f5f5f3;
   --okit-notice-border: #e2e0db;
@@ -456,6 +457,7 @@
   margin: 0.9rem 0 1.2rem 0;
   background: var(--okit-event-callout-bg);
   color: var(--okit-event-callout-text);
+  border: 1px solid var(--okit-event-callout-border);
   border-radius: 10px;
 }
 
@@ -467,6 +469,14 @@
   color: var(--okit-event-callout-text);
   font-size: 1.02rem;
   font-weight: 700;
+  line-height: 1.35;
+}
+
+.bkit-calendar-event__meta,
+.bkit-event-meta {
+  margin-top: 0.35rem;
+  color: var(--okit-event-callout-text);
+  font-size: 0.95rem;
   line-height: 1.35;
 }
 
@@ -488,6 +498,34 @@
   line-height: 1.4;
 }
 
+.bkit-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0;
+  padding: 0.7rem 1rem;
+  border: 1px solid #c7d8f1;
+  border-radius: 999px;
+  background: #f4f9ff;
+  color: #1b4d84;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.bkit-admin-link:hover,
+.bkit-admin-link:focus {
+  background: #e9f3ff;
+  color: #143a63;
+  text-decoration: none;
+}
+
+.bkit-admin-link--denied {
+  background: transparent;
+  border-style: dashed;
+  color: #606a73;
+}
+
 .openkit-calendar-events {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
@@ -498,7 +536,7 @@
 .openkit-calendar-events__header,
 .openkit-calendar-events__row {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr) 40px;
+  grid-template-columns: 160px minmax(0, 1fr) 110px 140px 140px 40px;
   gap: 12px;
   align-items: center;
 }
@@ -520,6 +558,15 @@
 
 .openkit-calendar-events__text {
   width: 100%;
+}
+
+.openkit-calendar-events__type,
+.openkit-calendar-events__time {
+  width: 100%;
+}
+
+.openkit-calendar-events__row:not(.is-time-event) .openkit-calendar-events__time {
+  opacity: .55;
 }
 
 .openkit-calendar-events__remove {

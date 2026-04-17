@@ -76,6 +76,18 @@
 		);
 	}
 
+	function syncCalendarEventRow($row) {
+		var isTimeEvent;
+
+		if ( ! $row || ! $row.length) {
+			return;
+		}
+
+		isTimeEvent = String( $row.find( '[data-openkit-event-type]' ).val() || 'text' ) === 'time';
+		$row.toggleClass( 'is-time-event', isTimeEvent );
+		$row.find( '[data-openkit-event-open-time], [data-openkit-event-close-time]' ).prop( 'disabled', ! isTimeEvent );
+	}
+
 	$( document ).on(
 		'click',
 		'.bkit-admin-cal .bkit-cell.day',
@@ -268,6 +280,7 @@
 			nextIndex = $rows.find( '[data-openkit-calendar-event-row]' ).length;
 			templateHtml = String( $template.html() || '' ).replace( /__INDEX__/g, String( nextIndex ) );
 			$rows.append( templateHtml );
+			syncCalendarEventRow( $rows.find( '[data-openkit-calendar-event-row]' ).last() );
 		}
 	);
 
@@ -286,10 +299,28 @@
 
 			if ( $rows.find( '[data-openkit-calendar-event-row]' ).length <= 1 ) {
 				$row.find( 'input' ).val( '' );
+				$row.find( '[data-openkit-event-type]' ).val( 'text' );
+				syncCalendarEventRow( $row );
 				return;
 			}
 
 			$row.remove();
 		}
 	);
+
+	$( document ).on(
+		'change',
+		'[data-openkit-event-type]',
+		function () {
+			syncCalendarEventRow( $( this ).closest( '[data-openkit-calendar-event-row]' ) );
+		}
+	);
+
+	$( function () {
+		$( '[data-openkit-calendar-event-row]' ).each(
+			function () {
+				syncCalendarEventRow( $( this ) );
+			}
+		);
+	} );
 })( jQuery );

@@ -113,6 +113,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 					$atts['show_legend'],
 					OpenCalendarKit_Admin_Settings::is_enabled( 'show_calendar_legend' )
 				);
+				$time_format    = OpenCalendarKit_Admin_Settings::get_time_format();
 
 				$date              = self::normalize_month( $atts['month'], $timezone );
 				$year              = (int) $date->format( 'Y' );
@@ -162,7 +163,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 					$closed_by_rule  = ! empty( $config['closed'] );
 					$closed_by_event = OpenCalendarKit_Admin_ClosedDays::is_closed_on( $cell_date );
 					$open_override   = OpenCalendarKit_Admin_ClosedDays::is_open_exception_on( $cell_date );
-					$event_text      = OpenCalendarKit_Admin_CalendarEvents::get_event_text( $cell_date );
+					$event           = OpenCalendarKit_Admin_CalendarEvents::get_event_display_data( $cell_date, $time_format );
 					$state           = ( $closed_by_event || ( $closed_by_rule && ! $open_override ) ) ? 'closed' : 'open';
 					$past            = $cell_date < $today;
 
@@ -171,7 +172,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 						'date'       => $cell_date,
 						'state'      => $state,
 						'past'       => $past,
-						'event_text' => $event_text,
+						'event'      => $event,
 					);
 				}
 
@@ -226,7 +227,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 								}
 
 								$cell         = $cells[ $day_index++ ];
-								$has_event    = '' !== $cell['event_text'];
+								$has_event    = is_array( $cell['event'] ) && '' !== $cell['event']['summary'];
 								$is_clickable = $has_event || ( ! $cell['past'] && 'closed' === $cell['state'] );
 								$reason           = '';
 								if ( 'closed' === $cell['state'] ) {
@@ -237,11 +238,13 @@ class OpenCalendarKit_Shortcode_Calendar {
 
 								echo '<td class="bkit-td">';
 								printf(
-									'<button class="%s" data-date="%s"%s%s type="button" %s><span class="num">%d</span></button>',
+									'<button class="%s" data-date="%s"%s%s%s%s type="button" %s><span class="num">%d</span></button>',
 									esc_attr( $classes ),
 									esc_attr( $cell['date'] ),
 									'' !== $reason ? ' data-reason="' . esc_attr( $reason ) . '"' : '',
-									$has_event ? ' data-event-text="' . esc_attr( $cell['event_text'] ) . '"' : '',
+									$has_event ? ' data-event-text="' . esc_attr( 'time' === $cell['event']['type'] ? '' : $cell['event']['summary'] ) . '"' : '',
+									$has_event ? ' data-event-title="' . esc_attr( 'time' === $cell['event']['type'] ? $cell['event']['title'] : __( 'Event', 'open-calendar-kit' ) ) . '"' : '',
+									$has_event ? ' data-event-meta="' . esc_attr( $cell['event']['time_label'] ) . '"' : '',
 									$cell['past'] ? 'aria-disabled="true"' : '',
 									(int) $cell['day']
 								);
@@ -277,6 +280,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 							<div class="bkit-event-info" style="display:none;">
 								<div class="bkit-event-title"><?php echo esc_html__( 'Event', 'open-calendar-kit' ); ?></div>
 								<div class="bkit-event-date"></div>
+								<div class="bkit-event-meta"></div>
 								<div class="bkit-event-text"></div>
 
 								<div class="bkit-modal-actions">

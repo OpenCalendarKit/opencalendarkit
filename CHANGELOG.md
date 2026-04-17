@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+- Added day-specific time events with opening and closing times in the calendar-events table.
+- Updated the current-day status logic to respect the priority closed day > time event > open exception > weekly opening hours.
+- Added the `[openkit_admin_link]` shortcode for staff login and quick backend access.
+- Updated frontend event output for special opening times and refined event callout styling.
+- Clarified README and WordPress.org plugin descriptions around the core use case.
+
 ## 1.1.0
 
 - Added simple day-based calendar events below the admin calendar.

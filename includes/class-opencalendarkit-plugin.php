@@ -18,7 +18,7 @@ if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.1.0' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.1' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
@@ -36,6 +36,7 @@ require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-sh
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-eventnotice.php';
+require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-adminlink.php';
 
 /**
  * Main plugin coordinator.
@@ -73,6 +74,7 @@ class OpenCalendarKit_Plugin {
 	const SHORTCODE_OPENING_HOURS = 'openkit_opening_hours';
 	const SHORTCODE_STATUS_TODAY  = 'openkit_status_today';
 	const SHORTCODE_EVENT_NOTICE  = 'openkit_event_notice';
+	const SHORTCODE_ADMIN_LINK    = 'openkit_admin_link';
 
 	const AJAX_CALENDAR_MONTH        = 'openkit_calendar_month';
 	const AJAX_ADMIN_CALENDAR_MONTH  = 'openkit_admin_calendar_month';
@@ -87,7 +89,7 @@ class OpenCalendarKit_Plugin {
 	const NONCE_EVENT_NOTICE    = 'openkit_save_event_notice';
 	const NONCE_CLOSED_DAY_META = 'openkit_closed_day_meta';
 
-	const DATA_VERSION = '1.1.0';
+	const DATA_VERSION = '1.1.1';
 
 	/**
 	 * Register runtime hooks.
@@ -114,6 +116,7 @@ class OpenCalendarKit_Plugin {
 		add_shortcode( self::SHORTCODE_OPENING_HOURS, array( 'OpenCalendarKit_Shortcode_OpeningHours', 'render' ) );
 		add_shortcode( self::SHORTCODE_STATUS_TODAY, array( 'OpenCalendarKit_Shortcode_StatusToday', 'render' ) );
 		add_shortcode( self::SHORTCODE_EVENT_NOTICE, array( 'OpenCalendarKit_Shortcode_EventNotice', 'render' ) );
+		add_shortcode( self::SHORTCODE_ADMIN_LINK, array( 'OpenCalendarKit_Shortcode_AdminLink', 'render' ) );
 
 		add_action( 'wp_ajax_' . self::AJAX_CALENDAR_MONTH, array( $this, 'ajax_calendar_month' ) );
 		add_action( 'wp_ajax_nopriv_' . self::AJAX_CALENDAR_MONTH, array( $this, 'ajax_calendar_month' ) );

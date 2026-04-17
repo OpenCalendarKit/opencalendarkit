@@ -14,6 +14,33 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class OpenCalendarKit_Shortcode_StatusToday {
 	/**
+	 * Build the opening-range datetimes for explicit time values.
+	 *
+	 * @param string       $start_value Opening time in H:i.
+	 * @param string       $end_value   Closing time in H:i.
+	 * @param DateTimeZone $timezone    Timezone to use.
+	 * @param DateTime     $now         Current date context.
+	 * @return array{0:?DateTime,1:?DateTime}
+	 */
+	protected static function get_time_range_for_values( string $start_value, string $end_value, DateTimeZone $timezone, DateTime $now ): array {
+		$start_value = trim( $start_value );
+		$end_value   = trim( $end_value );
+
+		$start = $start_value ? DateTime::createFromFormat( '!H:i', $start_value, $timezone ) : null;
+		$end   = $end_value ? DateTime::createFromFormat( '!H:i', $end_value, $timezone ) : null;
+
+		if ( $start ) {
+			$start->setDate( (int) $now->format( 'Y' ), (int) $now->format( 'm' ), (int) $now->format( 'd' ) );
+		}
+
+		if ( $end ) {
+			$end->setDate( (int) $now->format( 'Y' ), (int) $now->format( 'm' ), (int) $now->format( 'd' ) );
+		}
+
+		return array( $start, $end );
+	}
+
+	/**
 	 * Get the WordPress timezone object.
 	 *
 	 * @return DateTimeZone
@@ -43,19 +70,11 @@ class OpenCalendarKit_Shortcode_StatusToday {
 	protected static function get_time_range_for_row( array $row, DateTimeZone $timezone, DateTime $now ): array {
 		$from = trim( (string) ( $row['from'] ?? '' ) );
 		$to   = trim( (string) ( $row['to'] ?? '' ) );
-
-		$start = $from ? DateTime::createFromFormat( '!H:i', $from, $timezone ) : null;
-		$end   = ( stripos( $to, 'open' ) !== false ) ? null : ( $to ? DateTime::createFromFormat( '!H:i', $to, $timezone ) : null );
-
-		if ( $start ) {
-			$start->setDate( (int) $now->format( 'Y' ), (int) $now->format( 'm' ), (int) $now->format( 'd' ) );
+		if ( stripos( $to, 'open' ) !== false ) {
+			$to = '';
 		}
 
-		if ( $end ) {
-			$end->setDate( (int) $now->format( 'Y' ), (int) $now->format( 'm' ), (int) $now->format( 'd' ) );
-		}
-
-		return array( $start, $end );
+		return static::get_time_range_for_values( $from, $to, $timezone, $now );
 	}
 
 	/**
@@ -91,6 +110,7 @@ class OpenCalendarKit_Shortcode_StatusToday {
 				$day_of_week    = (int) $now->format( 'N' );
 				$date           = $now->format( 'Y-m-d' );
 				$closed_event   = OpenCalendarKit_Admin_ClosedDays::is_closed_on( $date );
+				$calendar_event = OpenCalendarKit_Admin_CalendarEvents::get_event( $date );
 				$open_override  = OpenCalendarKit_Admin_ClosedDays::is_open_exception_on( $date );
 				$hours          = OpenCalendarKit_Admin_OpeningHours::get_hours();
 				$row            = $hours[ $day_of_week ] ?? array(
@@ -103,7 +123,34 @@ class OpenCalendarKit_Shortcode_StatusToday {
 				$label = __( 'Today closed', 'open-calendar-kit' );
 				$class = 'closed';
 
-				if ( ! $closed_event && ! $is_rule_closed ) {
+				if ( ! $closed_event && is_array( $calendar_event ) && 'time' === $calendar_event['type'] ) {
+					[ $start, $end ] = static::get_time_range_for_values(
+						(string) $calendar_event['open_time'],
+						(string) $calendar_event['close_time'],
+						$timezone,
+						$now
+					);
+
+					if ( ! $start ) {
+						$label = __( 'Today closed', 'open-calendar-kit' );
+						$class = 'closed';
+					} elseif ( $now < $start ) {
+						/* translators: %s: opening time for today. */
+						$label = sprintf( __( 'Opens today at %s', 'open-calendar-kit' ), $start->format( $time_format ) );
+						$class = 'upcoming';
+					} elseif ( ! $end || $now <= $end ) {
+						if ( $end ) {
+							/* translators: %s: closing time for today. */
+							$label = sprintf( __( 'Open now until %s', 'open-calendar-kit' ), $end->format( $time_format ) );
+						} else {
+							$label = __( 'Open now', 'open-calendar-kit' );
+						}
+						$class = 'open';
+					} else {
+						$label = __( 'Closed now', 'open-calendar-kit' );
+						$class = 'ended';
+					}
+				} elseif ( ! $closed_event && ! $is_rule_closed ) {
 					[ $start, $end ] = static::get_time_range_for_row( $row, $timezone, $now );
 
 					if ( ! $start ) {

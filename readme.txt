@@ -4,44 +4,50 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Public WordPress plugin for opening hours, closed days, monthly calendars, calendar events, event notices, and optional status displays.
+Lightweight business-hours plugin for opening hours, status today, closed days, special opening times, and calendar events.
 
 == Description ==
 
-OpenCalendarKit provides a lightweight public plugin for recurring opening hours, closed days, calendar events, a monthly calendar, an optional event notice, and an optional "status today" output.
+OpenCalendarKit helps small websites show clear public opening information without turning the site into a booking system.
 
-It is built for restaurants, cafes, shops, and other small businesses that want a simple and clear way to show:
+It is a good fit for:
 
-* opening hours
-* whether they are open right now
-* special closed days
-* a current notice or announcement
+* restaurants
+* cafes
+* studios
+* practices
+* local shops
 
-Unlike large event or booking plugins, OpenCalendarKit focuses on business visibility, not on tickets, appointments, or complex reservation workflows.
+It helps you:
 
-The current Public 1.1 scope includes:
+* show recurring opening hours
+* show whether you are open today, opening later today, or already closed
+* manage closed days and exceptions
+* add calendar events for specific days
+* add special opening times for a single day
+* show a monthly calendar on the frontend
+* show a current event or special-opening card for today or a requested date
+* offer staff a simple login or backend link to the plugin screens
 
-* Opening hours management in the WordPress admin
-* Closed days managed in the plugin calendar
-* Monthly calendar shortcode output
-* Day-based calendar events with frontend highlighting
-* Optional status display for the current day
-* Optional event notice output
-* Global display settings for legend, title, week start, and time format
-* Bundled translation files and JavaScript locale data for German and French
-* Internationalization-ready visible strings and WordPress-aware date/time output
-* CSS custom properties prepared for future theme variants
+OpenCalendarKit stays focused on public business information. It does not add reservations, appointments, ticketing, or other large workflows.
 
-The current Public 1.1 scope does not include:
+Each calendar day can store one event. That event can be either:
 
-* Reservation or booking workflows
-* Multi-location support
-* Block editor blocks
-* Advanced event management
+* a text event
+* a time event with special opening hours for that date
+
+For the daily opening logic, the priority is:
+
+1. Closed day
+2. Time event
+3. Open exception
+4. Normal weekly opening hours
+
+That means a closed day still wins, but a time event can override the regular weekday rule for that one date.
 
 Available shortcodes:
 
@@ -50,71 +56,73 @@ Available shortcodes:
 * `[openkit_calendar]`
 * `[openkit_calendar_event]`
 * `[openkit_event_notice]`
+* `[openkit_admin_link]`
+
+The plugin ZIP includes the bundled language files from `languages/`, including `.pot`, `.po`, `.mo`, and JavaScript translation JSON files.
 
 == Installation ==
 
 1. Upload the `open-calendar-kit` folder to `/wp-content/plugins/`, or install it as a ZIP package in the WordPress admin.
 2. Activate **OpenCalendarKit** through the Plugins screen.
 3. Open **OpenCalendarKit** in the WordPress admin.
-4. Configure display settings, opening hours, closed days, and event notice.
-5. Insert the provided `openkit_*` shortcodes into pages, posts, or widget areas.
-
-The same plugin ZIP also contains the bundled language files from `languages/`, including `.po`, `.mo`, and JavaScript translation JSON files.
+4. Configure settings, opening hours, closed days, calendar events, and the optional notice.
+5. Place the provided shortcodes in pages, posts, or widget areas.
 
 == Frequently Asked Questions ==
 
-= Does this plugin include reservations or bookings? =
+= Is this a booking or reservation plugin? =
 
-No. Reservation functionality is intentionally out of scope for the public plugin.
+No. OpenCalendarKit is intentionally focused on public schedule display.
 
-= Which settings are available? =
+= What can I manage in the calendar area? =
 
-OpenCalendarKit currently provides these global settings:
+You can manage:
 
-* Plugin Language
-* Show Status Today
-* Show Calendar Legend
-* Week Starts On
-* Time Format Mode
-* Show Opening Hours Title
+* closed days
+* exceptional openings
+* one event per day
+* text events
+* special opening times for a single date
 
-= How are closed days handled? =
+= How do time events work? =
 
-Closed days are managed in the OpenCalendarKit calendar area in the WordPress admin. They are reflected in the calendar output and can include an optional reason.
+A time event stores an opening time and an optional closing time for a specific day. It is useful for days that should have different hours than the normal weekly schedule.
 
-= Is the plugin translation-ready? =
+= What does the admin-link shortcode do? =
 
-Yes. Visible strings use the `open-calendar-kit` text domain, and date/time output follows WordPress locale and time-format handling.
-Translation files belong in the plugin `languages/` directory. A starter template is included as `languages/open-calendar-kit.pot`.
-By default, the plugin follows the WordPress website language. You can override the plugin language in the plugin settings.
-The same language source is applied to admin pages, frontend shortcodes, calendar titles, weekday labels, legends, and JS-localized texts.
-Included example language files: `de_DE` and `fr_FR`. English uses the source strings.
-Editorial content such as event notice content, opening-hours notes, and closed-day reasons is not translated automatically by this setting.
+`[openkit_admin_link]` gives staff a simple frontend link.
 
-= Are the language files included in the plugin ZIP? =
+If the user is logged out, it links to `wp-login.php` and redirects to the requested OpenCalendarKit backend page after login.
 
-Yes. The release ZIP contains the plugin code together with the files in `languages/`, including the `.pot`, bundled `.po` and `.mo` files, and the JavaScript translation JSON files.
+If the user is logged in and has the `openkit_manage` capability, it links directly to the requested backend screen.
 
-= Can the design be themed later? =
+Supported targets:
 
-Yes. The frontend stylesheet already exposes CSS custom properties for status colors, calendar day states, event highlights, notices, and event callouts. That gives later theme variants a stable base without changing the shortcode API.
+* `calendar`
+* `opening-hours`
 
-= Does uninstall remove my content? =
+Examples:
 
-No. The uninstall behavior is intentionally data-friendly and does not delete managed content automatically.
+* `[openkit_admin_link target="calendar"]`
+* `[openkit_admin_link target="opening-hours"]`
+
+= Can I theme it later? =
+
+Yes. The frontend stylesheet already uses CSS custom properties for day states, notices, and event callouts so later theme variants can build on a stable base.
 
 == Changelog ==
 
+= 1.1.1 =
+
+* Added day-specific time events with opening and closing times in the calendar-events table
+* Updated the daily status logic to respect time events with the priority closed day > time event > open exception > weekly opening hours
+* Added the new `[openkit_admin_link]` shortcode for staff login and quick backend access
+* Updated frontend event output for special opening times
+* Clarified the public plugin description, shortcode overview, and feature summary
+
 = 1.1.0 =
 
-* Added simple day-based calendar events in the admin calendar screen
-* Added blue highlighted event days in the frontend calendar
-* Added the new shortcode `[openkit_calendar_event]` for the current day or a requested date
-* Added bundled German and French language files, updated `.pot`, and JavaScript translation JSON files
-* Aligned frontend and admin strings with the `open-calendar-kit` text domain
-* Prepared the frontend stylesheet with CSS custom properties for future theme variants
-
-= 1.0.4 =
-
-* Renamed plugin constants to use a clearer plugin-specific prefix
-* Cleared the remaining Plugin Check warning from the WordPress Playground review flow
+* Added simple day-based calendar events below the admin calendar
+* Added frontend event highlights and the `[openkit_calendar_event]` shortcode
+* Bundled German and French language files and JavaScript translation files
+* Prepared frontend CSS custom properties for future theme variants

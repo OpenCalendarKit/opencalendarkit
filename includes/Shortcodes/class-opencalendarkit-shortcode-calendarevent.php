@@ -44,9 +44,11 @@ class OpenCalendarKit_Shortcode_CalendarEvent {
 				$date     = is_string( $atts['date'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $atts['date'] )
 					? $atts['date']
 					: static::get_current_datetime( $timezone )->format( 'Y-m-d' );
-
-				$text = OpenCalendarKit_Admin_CalendarEvents::get_event_text( $date );
-				if ( '' === $text ) {
+				$event = OpenCalendarKit_Admin_CalendarEvents::get_event_display_data(
+					$date,
+					OpenCalendarKit_Admin_Settings::get_time_format()
+				);
+				if ( ! is_array( $event ) || '' === $event['summary'] ) {
 					return '';
 				}
 
@@ -54,7 +56,10 @@ class OpenCalendarKit_Shortcode_CalendarEvent {
 				?>
 				<div class="bkit-calendar-event bkit-ui-callout bkit-ui-callout--calendar-event">
 					<div class="bkit-calendar-event__inner">
-						<div class="bkit-calendar-event__text"><?php echo esc_html( $text ); ?></div>
+						<div class="bkit-calendar-event__text"><?php echo esc_html( $event['title'] ); ?></div>
+						<?php if ( '' !== $event['time_label'] ) : ?>
+							<div class="bkit-calendar-event__meta"><?php echo esc_html( $event['time_label'] ); ?></div>
+						<?php endif; ?>
 					</div>
 				</div>
 				<?php

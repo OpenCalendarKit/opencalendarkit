@@ -37,13 +37,15 @@
 		showModal();
 	}
 
-	function openModalForEvent(dateISO, datePretty, eventText) {
+	function openModalForEvent(dateISO, datePretty, eventTitle, eventText, eventMeta) {
 		var $modal = $( '.bkit-modal' );
 
 		hideModalPanels();
 		$modal.find( '.bkit-event-info' ).show();
 		$modal.find( '.bkit-event-date' ).text( datePretty || '' );
-		$modal.find( '.bkit-event-text' ).text( eventText || '' );
+		$modal.find( '.bkit-event-title' ).text( eventTitle || __( 'Event', 'open-calendar-kit' ) );
+		$modal.find( '.bkit-event-meta' ).text( eventMeta || '' ).toggle( !! eventMeta );
+		$modal.find( '.bkit-event-text' ).text( eventText || '' ).toggle( !! eventText );
 
 		showModal();
 	}
@@ -54,7 +56,9 @@
 		function () {
 			var date      = $( this ).data( 'date' ) || '';
 			var reason    = $( this ).data( 'reason' ) || '';
+			var eventTitle = $( this ).data( 'eventTitle' ) || '';
 			var eventText = $( this ).data( 'eventText' ) || '';
+			var eventMeta = $( this ).data( 'eventMeta' ) || '';
 			var pretty;
 
 			try {
@@ -66,8 +70,13 @@
 				pretty = date;
 			}
 
-			if (eventText) {
-				openModalForEvent( date, pretty, String( eventText ) );
+			if (reason) {
+				openModalForClosed( date, pretty, reason );
+				return;
+			}
+
+			if (eventText || eventTitle) {
+				openModalForEvent( date, pretty, String( eventTitle ), String( eventText ), String( eventMeta ) );
 				return;
 			}
 
