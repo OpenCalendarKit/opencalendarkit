@@ -17,6 +17,43 @@ class OpenCalendarKit_I18n {
 	const SITE_DEFAULT = 'site_default';
 
 	/**
+	 * Build the plugin MO file path for a locale.
+	 *
+	 * @param string $locale Locale code.
+	 * @return string
+	 */
+	private static function get_mofile_path( $locale ) {
+		return OPENKIT_PLUGIN_PATH . 'languages/' . self::TEXT_DOMAIN . '-' . $locale . '.mo';
+	}
+
+	/**
+	 * Reload the plugin text domain for a specific locale.
+	 *
+	 * This keeps plugin-specific locale switching in sync with bundled MO files.
+	 *
+	 * @param string $locale Locale code.
+	 * @return void
+	 */
+	private static function load_textdomain_for_locale( $locale ) {
+		if ( ! function_exists( 'unload_textdomain' ) || ! function_exists( 'load_textdomain' ) ) {
+			return;
+		}
+
+		if ( is_textdomain_loaded( self::TEXT_DOMAIN ) ) {
+			unload_textdomain( self::TEXT_DOMAIN );
+		}
+
+		if ( ! is_string( $locale ) || '' === $locale ) {
+			return;
+		}
+
+		$mofile = self::get_mofile_path( $locale );
+		if ( file_exists( $mofile ) ) {
+			load_textdomain( self::TEXT_DOMAIN, $mofile );
+		}
+	}
+
+	/**
 	 * Get the configured WordPress locale.
 	 *
 	 * @return string
@@ -70,9 +107,9 @@ class OpenCalendarKit_I18n {
 	public static function get_available_locales() {
 		return array(
 			self::SITE_DEFAULT => __( 'Use WordPress language', 'open-calendar-kit' ),
-			'de_DE'            => 'Deutsch',
-			'en_US'            => 'English',
-			'fr_FR'            => 'Français',
+			'de_DE'            => _x( 'Deutsch', 'language name', 'open-calendar-kit' ),
+			'en_US'            => _x( 'English', 'language name', 'open-calendar-kit' ),
+			'fr_FR'            => _x( 'Français', 'language name', 'open-calendar-kit' ),
 		);
 	}
 
@@ -130,11 +167,15 @@ class OpenCalendarKit_I18n {
 		}
 
 		try {
+			self::load_textdomain_for_locale( $target_locale );
+
 			return $callback();
 		} finally {
 			if ( $switched ) {
 				restore_previous_locale();
 			}
+
+			self::load_textdomain_for_locale( self::get_runtime_locale() );
 		}
 	}
 }

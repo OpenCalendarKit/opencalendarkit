@@ -5,6 +5,12 @@
  */
 
 (function ($) {
+	var __ = ( window.wp && window.wp.i18n && window.wp.i18n.__ )
+		? window.wp.i18n.__
+		: function ( text ) {
+			return text;
+		};
+
 	function openModal(dateISO, reason, closedEvent, closedRule, openOverride) {
 		var $modal               = $( '#bkit-closedday-modal' );
 		var $openExceptionButton = $( '#bkit-toggle-open-exception' );
@@ -26,7 +32,11 @@
 
 		if (closedRule) {
 			$openExceptionButton
-			.text( openOverride ? OPEN_CALENDAR_KIT_ADMIN.remove_exceptional_opening : OPEN_CALENDAR_KIT_ADMIN.open_day_exceptionally )
+			.text(
+				openOverride
+					? __( 'Remove exceptional opening', 'open-calendar-kit' )
+					: __( 'Open day exceptionally', 'open-calendar-kit' )
+			)
 			.show();
 		} else {
 			$openExceptionButton.hide().text( '' );
@@ -137,13 +147,13 @@
 							300
 						);
 					} else {
-						var message = (response && response.data && response.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
+						var message = (response && response.data && response.data.msg) || __( 'Error', 'open-calendar-kit' );
 						$feedback.text( message ).css( 'color', '#e74c3c' ).show();
 					}
 				}
 			).fail(
 				function () {
-					$feedback.text( OPEN_CALENDAR_KIT_ADMIN.generic_error ).css( 'color', '#e74c3c' ).show();
+					$feedback.text( __( 'Error', 'open-calendar-kit' ) ).css( 'color', '#e74c3c' ).show();
 				}
 			);
 		}
@@ -155,7 +165,7 @@
 		function (event) {
 			event.preventDefault();
 
-			if ( ! confirm( OPEN_CALENDAR_KIT_ADMIN.confirm_reopen )) {
+			if ( ! confirm( __( 'Remove this closed day and mark it open again?', 'open-calendar-kit' ) )) {
 				return;
 			}
 
@@ -182,13 +192,13 @@
 							300
 						);
 					} else {
-						var message = (response && response.data && response.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
+						var message = (response && response.data && response.data.msg) || __( 'Error', 'open-calendar-kit' );
 						$feedback.text( message ).css( 'color', '#e74c3c' ).show();
 					}
 				}
 			).fail(
 				function () {
-					$feedback.text( OPEN_CALENDAR_KIT_ADMIN.generic_error ).css( 'color', '#e74c3c' ).show();
+					$feedback.text( __( 'Error', 'open-calendar-kit' ) ).css( 'color', '#e74c3c' ).show();
 				}
 			);
 		}
@@ -206,7 +216,7 @@
 			var month        = date.slice( 0, 7 );
 			var openOverride = String( $modal.data( 'openOverride' ) || '0' ) === '1';
 
-			if (openOverride && ! confirm( OPEN_CALENDAR_KIT_ADMIN.confirm_remove_exceptional_opening )) {
+			if (openOverride && ! confirm( __( 'Remove this exceptional opening and use the normal weekday rule again?', 'open-calendar-kit' ) )) {
 				return;
 			}
 
@@ -228,15 +238,58 @@
 							300
 						);
 					} else {
-						var message = (response && response.data && response.data.msg) || OPEN_CALENDAR_KIT_ADMIN.generic_error;
+						var message = (response && response.data && response.data.msg) || __( 'Error', 'open-calendar-kit' );
 						$feedback.text( message ).css( 'color', '#e74c3c' ).show();
 					}
 				}
 			).fail(
 				function () {
-					$feedback.text( OPEN_CALENDAR_KIT_ADMIN.generic_error ).css( 'color', '#e74c3c' ).show();
+					$feedback.text( __( 'Error', 'open-calendar-kit' ) ).css( 'color', '#e74c3c' ).show();
 				}
 			);
+		}
+	);
+
+	$( document ).on(
+		'click',
+		'[data-openkit-add-calendar-event]',
+		function (event) {
+			var $rows = $( '[data-openkit-calendar-event-rows]' );
+			var $template = $( '[data-openkit-calendar-event-template]' );
+			var templateHtml;
+			var nextIndex;
+
+			event.preventDefault();
+
+			if ( ! $rows.length || ! $template.length) {
+				return;
+			}
+
+			nextIndex = $rows.find( '[data-openkit-calendar-event-row]' ).length;
+			templateHtml = String( $template.html() || '' ).replace( /__INDEX__/g, String( nextIndex ) );
+			$rows.append( templateHtml );
+		}
+	);
+
+	$( document ).on(
+		'click',
+		'[data-openkit-remove-calendar-event]',
+		function (event) {
+			var $rows = $( '[data-openkit-calendar-event-rows]' );
+			var $row = $( this ).closest( '[data-openkit-calendar-event-row]' );
+
+			event.preventDefault();
+
+			if ( ! $row.length) {
+				return;
+			}
+
+			if ( $rows.find( '[data-openkit-calendar-event-row]' ).length <= 1 ) {
+				$row.find( 'input' ).val( '' );
+				return;
+			}
+
+			$row.remove();
 		}
 	);
 })( jQuery );

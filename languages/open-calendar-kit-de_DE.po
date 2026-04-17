@@ -1,6 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenCalendarKit 1.0.4\n"
+"Project-Id-Version: OpenCalendarKit 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/open-calendar-"
+"kit/\n"
+"POT-Creation-Date: \n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -8,272 +11,486 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: open-calendar-kit\n"
 
-msgid "Use WordPress language"
-msgstr "WordPress-Sprache verwenden"
-
-msgid "Plugin language"
-msgstr "Plugin-Sprache"
-
-msgid "Use the website language by default, or choose a language for OpenCalendarKit only."
-msgstr "Standardmäßig die Website-Sprache verwenden oder eine Sprache nur für OpenCalendarKit wählen."
-
-msgid "Settings"
-msgstr "Einstellungen"
-
-msgid "Show status today by default"
-msgstr "Status heute standardmäßig anzeigen"
-
-msgid "Allow the status shortcode to output by default."
-msgstr "Den Status-Shortcode standardmäßig ausgeben."
-
-msgid "Show calendar legend by default"
-msgstr "Kalenderlegende standardmäßig anzeigen"
-
-msgid "Display the open/closed legend below the calendar unless a shortcode overrides it."
-msgstr "Die Offen/Geschlossen-Legende unter dem Kalender anzeigen, sofern kein Shortcode sie überschreibt."
-
-msgid "Week starts on"
-msgstr "Wochenbeginn"
-
-msgid "Time format mode"
-msgstr "Zeitformat"
-
-msgid "Use WordPress setting"
-msgstr "WordPress-Einstellung verwenden"
-
-msgid "24-hour"
-msgstr "24-Stunden"
-
-msgid "12-hour"
-msgstr "12-Stunden"
-
-msgid "Show opening hours title by default"
-msgstr "Titel der Öffnungszeiten standardmäßig anzeigen"
-
-msgid "Display the heading above opening hours unless a shortcode overrides it."
-msgstr "Die Überschrift über den Öffnungszeiten anzeigen, sofern kein Shortcode sie überschreibt."
-
-msgid "Save settings"
-msgstr "Einstellungen speichern"
-
+#. Plugin Name of the plugin
+#: open-calendar-kit.php
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:25
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:26
 msgid "OpenCalendarKit"
 msgstr "OpenCalendarKit"
 
-msgid "Opening Hours"
-msgstr "Öffnungszeiten"
+#. Description of the plugin
+#: open-calendar-kit.php
+msgid ""
+"Public WordPress plugin for opening hours, closed days, monthly calendars, "
+"calendar events, event notices, and optional status displays."
+msgstr ""
+"Öffentliches WordPress-Plugin für Öffnungszeiten, Schließtage, monatliche "
+"Kalender, Kalender-Events, Event-Hinweise und optionale Statusanzeigen."
 
-msgid "Day"
-msgstr "Tag"
+#. Author of the plugin
+#: open-calendar-kit.php
+msgid "Jörn / ChatGPT"
+msgstr "Jörn / ChatGPT"
 
-msgid "Closed"
-msgstr "Geschlossen"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:111
+msgid "Calendar events saved."
+msgstr "Kalender-Events gespeichert."
 
-msgid "From"
-msgstr "Von"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:114
+msgid "Calendar Events"
+msgstr "Kalender-Events"
 
-msgid "To"
-msgstr "Bis"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:116
+msgid ""
+"Manage highlighted event dates for the frontend calendar. The shortcode "
+"[openkit_calendar_event] renders the event text for the current day or for a "
+"requested date. Only one event is stored per day; if a date is entered more "
+"than once, the last row wins."
+msgstr ""
+"Verwalte hervorgehobene Event-Tage für den Frontend-Kalender. Der Shortcode "
+"[openkit_calendar_event] gibt den Event-Text für den aktuellen Tag oder für "
+"ein angefordertes Datum aus. Pro Tag wird nur ein Event gespeichert; wenn "
+"ein Datum mehrfach eingetragen wird, gilt die letzte Zeile."
 
-msgid "Note below opening hours"
-msgstr "Hinweis unter den Öffnungszeiten"
-
-msgid "Optional note for visitors"
-msgstr "Optionaler Hinweis für Besucher"
-
-msgid "This text is shown below the opening hours on the frontend."
-msgstr "Dieser Text wird im Frontend unter den Öffnungszeiten angezeigt."
-
-msgid "Use shortcodes: [openkit_opening_hours], [openkit_status_today], [openkit_calendar]"
-msgstr "Shortcodes verwenden: [openkit_opening_hours], [openkit_status_today], [openkit_calendar]"
-
-msgid "Save"
-msgstr "Speichern"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Saved."
-msgstr "Gespeichert."
-
-msgid "Calendar"
-msgstr "Kalender"
-
-msgid "Closed Days"
-msgstr "Schließtage"
-
-msgid "Closed Day"
-msgstr "Schließtag"
-
-msgid "Closed Day Details"
-msgstr "Schließtag-Details"
-
-msgid "Title"
-msgstr "Titel"
-
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:123
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:215
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:629
 msgid "Date"
 msgstr "Datum"
 
-msgid "Date (YYYY-MM-DD)"
-msgstr "Datum (JJJJ-MM-TT)"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:124
+msgid "Text"
+msgstr "Text"
 
-msgid "Reason"
-msgstr "Grund"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:125
+msgid "Delete"
+msgstr "Löschen"
 
-msgid "Reason (optional)"
-msgstr "Grund (optional)"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:139
+msgid "+ Add event"
+msgstr "+ Event hinzufügen"
 
-msgid "Actions"
-msgstr "Aktionen"
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:140
+msgid "Save calendar events"
+msgstr "Kalender-Events speichern"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Set Closed Day"
-msgstr "Schließtag setzen"
-
-msgid "Close"
-msgstr "Schließen"
-
-msgid "Save closed day"
-msgstr "Schließtag speichern"
-
-msgid "Open day again"
-msgstr "Tag wieder öffnen"
-
-msgid "Open exceptionally: %s"
-msgstr "Ausnahmsweise geöffnet: %s"
-
-msgid "Not allowed"
-msgstr "Nicht erlaubt"
-
-msgid "Invalid date"
-msgstr "Ungültiges Datum"
-
-msgid "Updated closed day"
-msgstr "Schließtag aktualisiert"
-
-msgid "Created closed day"
-msgstr "Schließtag erstellt"
-
-msgid "Day is already open"
-msgstr "Tag ist bereits offen"
-
-msgid "Closed day removed (open again)"
-msgstr "Schließtag entfernt (wieder offen)"
-
-msgid "Exceptional opening saved"
-msgstr "Ausnahme-Öffnung gespeichert"
-
-msgid "Exceptional opening already removed"
-msgstr "Ausnahme-Öffnung war bereits entfernt"
-
-msgid "Exceptional opening removed"
-msgstr "Ausnahme-Öffnung entfernt"
-
-msgid "Closed: %s"
-msgstr "Geschlossen: %s"
-
-msgid "Event Notice"
-msgstr "Event-Hinweis"
-
-msgid "Event announcement active"
-msgstr "Event-Hinweis aktiv"
-
-msgid "Show the event notice on the frontend when content is available."
-msgstr "Den Event-Hinweis im Frontend anzeigen, wenn Inhalt vorhanden ist."
-
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:223
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:92
 msgid "Event text"
 msgstr "Hinweistext"
 
-msgid "Use the shortcode [openkit_event_notice] to output this content on the frontend."
-msgstr "Den Shortcode [openkit_event_notice] verwenden, um diesen Inhalt im Frontend auszugeben."
+#: includes/Admin/class-opencalendarkit-admin-calendarevents.php:225
+msgid "Delete event row"
+msgstr "Event-Zeile löschen"
 
+#. translators: %s: exceptional opening date in YYYY-MM-DD format.
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:140
+#, php-format
+msgid "Open exceptionally: %s"
+msgstr "Ausnahmsweise geöffnet: %s"
+
+#. translators: %s: closed day date in YYYY-MM-DD format.
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:144
+#, php-format
+msgid "Closed: %s"
+msgstr "Geschlossen: %s"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:174
+msgid "Closed Days"
+msgstr "Schließtage"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:175
+msgid "Closed Day"
+msgstr "Schließtag"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:214
+msgid "Title"
+msgstr "Titel"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:216
+msgid "Reason"
+msgstr "Grund"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:217
+msgid "Actions"
+msgstr "Aktionen"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:246
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:298
+msgid "Closed Day Details"
+msgstr "Schließtag-Details"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:323
+msgid "Date (YYYY-MM-DD)"
+msgstr "Datum (JJJJ-MM-TT)"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:327
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:633
+msgid "Reason (optional)"
+msgstr "Grund (optional)"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:483
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:484
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:619
+msgid "Calendar"
+msgstr "Kalender"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:624
+msgid "Set Closed Day"
+msgstr "Schließtag setzen"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:625
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:265
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:273
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:283
+msgid "Close"
+msgstr "Schließen"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:637
+msgid "Save closed day"
+msgstr "Schließtag speichern"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:639
+msgid "Open day again"
+msgstr "Tag wieder öffnen"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:642
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:203
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:680
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:708
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:777
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:807
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:857
+msgid "Not allowed"
+msgstr "Nicht erlaubt"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:685
+#: includes/class-opencalendarkit-plugin.php:333
+msgid "Invalid month"
+msgstr "Ungültiger Monat"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:715
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:782
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:812
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:862
+msgid "Invalid date"
+msgstr "Ungültiges Datum"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:736
+msgid "Updated closed day"
+msgstr "Schließtag aktualisiert"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:761
+msgid "Created closed day"
+msgstr "Schließtag erstellt"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:787
+msgid "Day is already open"
+msgstr "Tag ist bereits offen"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:791
+msgid "Closed day removed (open again)"
+msgstr "Schließtag entfernt (wieder offen)"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:820
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:841
+msgid "Exceptional opening saved"
+msgstr "Ausnahme-Öffnung gespeichert"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:867
+msgid "Exceptional opening already removed"
+msgstr "Ausnahme-Öffnung war bereits entfernt"
+
+#: includes/Admin/class-opencalendarkit-admin-closeddays.php:871
+msgid "Exceptional opening removed"
+msgstr "Ausnahme-Öffnung entfernt"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:26
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:27
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:68
+msgid "Event Notice"
+msgstr "Event-Hinweis"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:61
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:122
+msgid "Saved."
+msgstr "Gespeichert."
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:76
+msgid "Event announcement active"
+msgstr "Event-Hinweis aktiv"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:86
+msgid "Show the event notice on the frontend when content is available."
+msgstr "Den Event-Hinweis im Frontend anzeigen, wenn Inhalt vorhanden ist."
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:108
+msgid ""
+"Use the shortcode [openkit_event_notice] to output this content on the "
+"frontend."
+msgstr ""
+"Den Shortcode [openkit_event_notice] verwenden, um diesen Inhalt im Frontend "
+"auszugeben."
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:116
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:202
+msgid "Save"
+msgstr "Speichern"
+
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:36
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:37
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:139
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:108
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:129
+#: includes/Admin/class-opencalendarkit-admin-settings.php:290
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:23
 msgid "Monday"
 msgstr "Montag"
 
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:130
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:24
 msgid "Tuesday"
 msgstr "Dienstag"
 
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:131
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:25
 msgid "Wednesday"
 msgstr "Mittwoch"
 
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:132
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:26
 msgid "Thursday"
 msgstr "Donnerstag"
 
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:133
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:27
 msgid "Friday"
 msgstr "Freitag"
 
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:134
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:28
 msgid "Saturday"
 msgstr "Samstag"
 
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:135
+#: includes/Admin/class-opencalendarkit-admin-settings.php:291
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:29
 msgid "Sunday"
 msgstr "Sonntag"
 
-msgid "Mon"
-msgstr "Mo"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:147
+msgid "Day"
+msgstr "Tag"
 
-msgid "Tue"
-msgstr "Di"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:148
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:167
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:259
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:268
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:63
+msgid "Closed"
+msgstr "Geschlossen"
 
-msgid "Wed"
-msgstr "Mi"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:149
+msgid "From"
+msgstr "Von"
 
-msgid "Thu"
-msgstr "Do"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:150
+msgid "To"
+msgstr "Bis"
 
-msgid "Fri"
-msgstr "Fr"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:184
+msgid "Note below opening hours"
+msgstr "Hinweis unter den Öffnungszeiten"
 
-msgid "Sat"
-msgstr "Sa"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:192
+msgid "Optional note for visitors"
+msgstr "Optionaler Hinweis für Besucher"
 
-msgid "Sun"
-msgstr "So"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:195
+msgid "This text is shown below the opening hours on the frontend."
+msgstr "Dieser Text wird im Frontend unter den Öffnungszeiten angezeigt."
 
-msgid "Open end"
-msgstr "Open End"
+#: includes/Admin/class-opencalendarkit-admin-openinghours.php:207
+msgid ""
+"Use shortcodes: [openkit_opening_hours], [openkit_status_today], "
+"[openkit_calendar]"
+msgstr ""
+"Shortcodes verwenden: [openkit_opening_hours], [openkit_status_today], "
+"[openkit_calendar]"
 
-msgid "Today closed"
-msgstr "Heute geschlossen"
+#: includes/Admin/class-opencalendarkit-admin-settings.php:45
+#: includes/Admin/class-opencalendarkit-admin-settings.php:46
+#: includes/Admin/class-opencalendarkit-admin-settings.php:234
+msgid "Settings"
+msgstr "Einstellungen"
 
-msgid "Opens today at %s"
-msgstr "Öffnet heute um %s"
+#: includes/Admin/class-opencalendarkit-admin-settings.php:242
+msgid "Plugin language"
+msgstr "Plugin-Sprache"
 
-msgid "Open now"
-msgstr "Jetzt geöffnet"
+#: includes/Admin/class-opencalendarkit-admin-settings.php:252
+msgid ""
+"Use the website language by default, or choose a language for "
+"OpenCalendarKit only."
+msgstr ""
+"Standardmäßig die Website-Sprache verwenden oder eine Sprache nur für "
+"OpenCalendarKit wählen."
 
-msgid "Open now until %s"
-msgstr "Jetzt geöffnet bis %s"
+#: includes/Admin/class-opencalendarkit-admin-settings.php:257
+msgid "Show status today by default"
+msgstr "Status heute standardmäßig anzeigen"
 
-msgid "Closed now"
-msgstr "Jetzt geschlossen"
+#: includes/Admin/class-opencalendarkit-admin-settings.php:267
+msgid "Allow the status shortcode to output by default."
+msgstr "Den Status-Shortcode standardmäßig ausgeben."
 
+#: includes/Admin/class-opencalendarkit-admin-settings.php:272
+msgid "Show calendar legend by default"
+msgstr "Kalenderlegende standardmäßig anzeigen"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:282
+msgid ""
+"Display the open/closed legend below the calendar unless a shortcode "
+"overrides it."
+msgstr ""
+"Die Offen/Geschlossen-Legende unter dem Kalender anzeigen, sofern kein "
+"Shortcode sie überschreibt."
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:287
+msgid "Week starts on"
+msgstr "Wochenbeginn"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:296
+msgid "Time format mode"
+msgstr "Zeitformat"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:299
+msgid "Use WordPress setting"
+msgstr "WordPress-Einstellung verwenden"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:300
+msgid "24-hour"
+msgstr "24-Stunden"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:301
+msgid "12-hour"
+msgstr "12-Stunden"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:306
+msgid "Show opening hours title by default"
+msgstr "Titel der Öffnungszeiten standardmäßig anzeigen"
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:316
+msgid ""
+"Display the heading above opening hours unless a shortcode overrides it."
+msgstr ""
+"Die Überschrift über den Öffnungszeiten anzeigen, sofern kein Shortcode sie "
+"überschreibt."
+
+#: includes/Admin/class-opencalendarkit-admin-settings.php:323
+msgid "Save settings"
+msgstr "Einstellungen speichern"
+
+#: includes/class-opencalendarkit-i18n.php:72
+msgid "Use WordPress language"
+msgstr "WordPress-Sprache verwenden"
+
+#: includes/class-opencalendarkit-i18n.php:73
+msgctxt "language name"
+msgid "Deutsch"
+msgstr "Deutsch"
+
+#: includes/class-opencalendarkit-i18n.php:74
+msgctxt "language name"
+msgid "English"
+msgstr "Englisch"
+
+#: includes/class-opencalendarkit-i18n.php:75
+msgctxt "language name"
+msgid "Français"
+msgstr "Französisch"
+
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:198
 msgid "Previous month"
 msgstr "Vorheriger Monat"
 
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:203
 msgid "Next month"
 msgstr "Nächster Monat"
 
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:258
 msgid "Open"
 msgstr "Offen"
 
-msgid "Reason:"
-msgstr "Grund:"
+#: includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php:278
+msgid "Event"
+msgstr "Event"
 
-msgid "Error"
-msgstr "Fehler"
+#: includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php:51
+msgid "Open end"
+msgstr "Open End"
 
-msgid "Remove this closed day and mark it open again?"
-msgstr "Diesen Schließtag entfernen und den Tag wieder als offen markieren?"
+#: includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php:103
+#: includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php:110
+msgid "Today closed"
+msgstr "Heute geschlossen"
 
-msgid "Open day exceptionally"
-msgstr "Tag ausnahmsweise öffnen"
+#. translators: %s: opening time for today.
+#: includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php:114
+#, php-format
+msgid "Opens today at %s"
+msgstr "Öffnet heute um %s"
 
+#. translators: %s: closing time for today.
+#: includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php:119
+#, php-format
+msgid "Open now until %s"
+msgstr "Jetzt geöffnet bis %s"
+
+#: includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php:121
+msgid "Open now"
+msgstr "Jetzt geöffnet"
+
+#: includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php:125
+msgid "Closed now"
+msgstr "Jetzt geschlossen"
+
+#: assets/js/open-calendar-kit-admin.js:37
 msgid "Remove exceptional opening"
 msgstr "Ausnahme-Öffnung entfernen"
 
-msgid "Remove this exceptional opening and use the normal weekday rule again?"
-msgstr "Diese Ausnahme-Öffnung entfernen und wieder die normale Wochentagsregel verwenden?"
+#: assets/js/open-calendar-kit-admin.js:38
+msgid "Open day exceptionally"
+msgstr "Tag ausnahmsweise öffnen"
 
-msgid "Invalid month"
-msgstr "Ungültiger Monat"
+#: assets/js/open-calendar-kit-admin.js:150
+#: assets/js/open-calendar-kit-admin.js:156
+#: assets/js/open-calendar-kit-admin.js:195
+#: assets/js/open-calendar-kit-admin.js:201
+#: assets/js/open-calendar-kit-admin.js:241
+#: assets/js/open-calendar-kit-admin.js:247
+msgid "Error"
+msgstr "Fehler"
+
+#: assets/js/open-calendar-kit-admin.js:168
+msgid "Remove this closed day and mark it open again?"
+msgstr "Diesen Schließtag entfernen und den Tag wieder als offen markieren?"
+
+#: assets/js/open-calendar-kit-admin.js:219
+msgid "Remove this exceptional opening and use the normal weekday rule again?"
+msgstr ""
+"Diese Ausnahme-Öffnung entfernen und wieder die normale Wochentagsregel "
+"verwenden?"
+
+#: assets/js/open-calendar-kit.js:35
+msgid "Reason:"
+msgstr "Grund:"

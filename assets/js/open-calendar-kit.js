@@ -5,6 +5,12 @@
  */
 
 (function ($) {
+	var __ = ( window.wp && window.wp.i18n && window.wp.i18n.__ )
+		? window.wp.i18n.__
+		: function ( text ) {
+			return text;
+		};
+
 	function showModal() {
 		var $modal = $( '.bkit-modal' );
 		$modal.find( '.bkit-feedback' ).hide().text( '' );
@@ -15,22 +21,40 @@
 		$( '.bkit-modal' ).hide();
 	}
 
+	function hideModalPanels() {
+		var $modal = $( '.bkit-modal' );
+		$modal.find( '.bkit-closed-info, .bkit-event-info' ).hide();
+	}
+
 	function openModalForClosed(dateISO, datePretty, reason) {
 		var $modal = $( '.bkit-modal' );
 
+		hideModalPanels();
 		$modal.find( '.bkit-closed-info' ).show();
 		$modal.find( '.bkit-closed-date' ).text( datePretty || '' );
-		$modal.find( '.bkit-closed-reason' ).text( reason ? (OPEN_CALENDAR_KIT.reason_label + ' ' + reason) : '' );
+		$modal.find( '.bkit-closed-reason' ).text( reason ? (__( 'Reason:', 'open-calendar-kit' ) + ' ' + reason) : '' );
+
+		showModal();
+	}
+
+	function openModalForEvent(dateISO, datePretty, eventText) {
+		var $modal = $( '.bkit-modal' );
+
+		hideModalPanels();
+		$modal.find( '.bkit-event-info' ).show();
+		$modal.find( '.bkit-event-date' ).text( datePretty || '' );
+		$modal.find( '.bkit-event-text' ).text( eventText || '' );
 
 		showModal();
 	}
 
 	$( document ).on(
 		'click',
-		'.bkit-cell.day.closed.clickable',
+		'.bkit-cell.day.clickable',
 		function () {
-			var date   = $( this ).data( 'date' ) || '';
-			var reason = $( this ).data( 'reason' ) || '';
+			var date      = $( this ).data( 'date' ) || '';
+			var reason    = $( this ).data( 'reason' ) || '';
+			var eventText = $( this ).data( 'eventText' ) || '';
 			var pretty;
 
 			try {
@@ -40,6 +64,11 @@
 				);
 			} catch (error) {
 				pretty = date;
+			}
+
+			if (eventText) {
+				openModalForEvent( date, pretty, String( eventText ) );
+				return;
 			}
 
 			openModalForClosed( date, pretty, reason );

@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: OpenCalendarKit
- * Description: Public WordPress plugin for opening hours, closed days, monthly calendars, event notices, and optional status displays.
- * Version: 1.0.4
+ * Description: Public WordPress plugin for opening hours, closed days, monthly calendars, calendar events, event notices, and optional status displays.
+ * Version: 1.1.0
  * Author: Jörn / ChatGPT
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

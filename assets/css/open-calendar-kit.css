@@ -11,6 +11,22 @@
   --okit-color-success-border: #bfead0;
   --okit-color-danger-soft: #fdeaea;
   --okit-color-danger-border: #f2c6c6;
+  --okit-color-event: #1f6fe5;
+  --okit-color-event-soft: #e2f0ff;
+  --okit-color-event-border: #b7d3f7;
+  --okit-color-event-text: #111111;
+  --okit-color-event-strong-text: #ffffff;
+
+  /* Future theme hooks for calendar states and event callouts. */
+  --okit-day-open-bg: var(--okit-color-success-soft);
+  --okit-day-open-border: var(--okit-color-success-border);
+  --okit-day-closed-bg: var(--okit-color-danger-soft);
+  --okit-day-closed-border: var(--okit-color-danger-border);
+  --okit-day-event-bg: var(--okit-color-event-soft);
+  --okit-day-event-border: var(--okit-color-event-border);
+  --okit-day-event-text: var(--okit-color-event-text);
+  --okit-event-callout-bg: var(--okit-color-event);
+  --okit-event-callout-text: var(--okit-color-event-strong-text);
 
   --okit-notice-bg: #f5f5f3;
   --okit-notice-border: #e2e0db;
@@ -271,8 +287,8 @@
 }
 
 .bkit-cell.day.open {
-  background: var(--okit-color-success-soft);
-  outline: 1px solid var(--okit-color-success-border);
+  background: var(--okit-day-open-bg);
+  outline: 1px solid var(--okit-day-open-border);
 }
 
 .bkit-cell.day.open.clickable {
@@ -280,8 +296,8 @@
 }
 
 .bkit-cell.day.closed {
-  background: var(--okit-color-danger-soft);
-  outline: 1px solid var(--okit-color-danger-border);
+  background: var(--okit-day-closed-bg);
+  outline: 1px solid var(--okit-day-closed-border);
   cursor: pointer;
 }
 
@@ -322,13 +338,13 @@
 }
 
 .bkit-legend .legend.open::before {
-  background: var(--okit-color-success-soft);
-  border: 1px solid var(--okit-color-success-border);
+  background: var(--okit-day-open-bg);
+  border: 1px solid var(--okit-day-open-border);
 }
 
 .bkit-legend .legend.closed::before {
-  background: var(--okit-color-danger-soft);
-  border: 1px solid var(--okit-color-danger-border);
+  background: var(--okit-day-closed-bg);
+  border: 1px solid var(--okit-day-closed-border);
 }
 
 .bkit-calendar .bkit-cal-table {
@@ -376,13 +392,28 @@
 }
 
 .bkit-calendar .bkit-cal-table button.bkit-cell.day.open {
-  background: var(--okit-color-success-soft);
-  outline: 1px solid var(--okit-color-success-border);
+  background: var(--okit-day-open-bg);
+  outline: 1px solid var(--okit-day-open-border);
 }
 
 .bkit-calendar .bkit-cal-table button.bkit-cell.day.closed {
-  background: var(--okit-color-danger-soft);
-  outline: 1px solid var(--okit-color-danger-border);
+  background: var(--okit-day-closed-bg);
+  outline: 1px solid var(--okit-day-closed-border);
+}
+
+.bkit-cell.day.has-event,
+.bkit-calendar .bkit-cal-table button.bkit-cell.day.has-event {
+  background: var(--okit-day-event-bg);
+  outline: 1px solid var(--okit-day-event-border);
+}
+
+.bkit-cell.day.has-event .num,
+.bkit-calendar .bkit-cal-table button.bkit-cell.day.has-event .num {
+  color: var(--okit-day-event-text);
+}
+
+.bkit-calendar .bkit-cal-table button.bkit-cell.day.has-event.clickable {
+  cursor: pointer;
 }
 
 .bkit-calendar .bkit-cal-table button.bkit-cell.day.open.clickable {
@@ -417,6 +448,105 @@
 .bkit-calendar .bkit-grid button.bkit-cell:focus {
   outline: 2px solid rgba(0, 0, 0, .15);
   outline-offset: 2px;
+}
+
+.bkit-calendar-event {
+  display: block;
+  width: 100%;
+  margin: 0.9rem 0 1.2rem 0;
+  background: var(--okit-event-callout-bg);
+  color: var(--okit-event-callout-text);
+  border-radius: 10px;
+}
+
+.bkit-calendar-event__inner {
+  padding: 14px 16px;
+}
+
+.bkit-calendar-event__text {
+  color: var(--okit-event-callout-text);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.bkit-event-title,
+.bkit-closed-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.bkit-event-date,
+.bkit-closed-date {
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+.bkit-event-text,
+.bkit-closed-reason {
+  line-height: 1.4;
+}
+
+.openkit-calendar-events {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dcdcde;
+  max-width: 760px;
+}
+
+.openkit-calendar-events__header,
+.openkit-calendar-events__row {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) 40px;
+  gap: 12px;
+  align-items: center;
+}
+
+.openkit-calendar-events__header {
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #1d2327;
+}
+
+.openkit-calendar-events__rows {
+  display: grid;
+  gap: 8px;
+}
+
+.openkit-calendar-events__row input[type="date"] {
+  width: 100%;
+}
+
+.openkit-calendar-events__text {
+  width: 100%;
+}
+
+.openkit-calendar-events__remove {
+  font-size: 22px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.openkit-calendar-events__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+@media (max-width: 640px) {
+  .openkit-calendar-events__header {
+    display: none;
+  }
+
+  .openkit-calendar-events__row {
+    grid-template-columns: 1fr;
+  }
+
+  .openkit-calendar-events__actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 /* =========================================================

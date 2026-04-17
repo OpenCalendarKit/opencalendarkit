@@ -1,0 +1,30 @@
+{
+    "translation-revision-date": "2026-04-17T10:46:42+00:00",
+    "generator": "WP-CLI/2.12.0",
+    "source": "assets/js/open-calendar-kit-admin.js",
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "de_DE",
+                "plural-forms": "nplurals=2; plural=(n != 1);"
+            },
+            "Remove exceptional opening": [
+                "Ausnahme-Öffnung entfernen"
+            ],
+            "Open day exceptionally": [
+                "Tag ausnahmsweise öffnen"
+            ],
+            "Error": [
+                "Fehler"
+            ],
+            "Remove this closed day and mark it open again?": [
+                "Diesen Schließtag entfernen und den Tag wieder als offen markieren?"
+            ],
+            "Remove this exceptional opening and use the normal weekday rule again?": [
+                "Diese Ausnahme-Öffnung entfernen und wieder die normale Wochentagsregel verwenden?"
+            ]
+        }
+    }
+}

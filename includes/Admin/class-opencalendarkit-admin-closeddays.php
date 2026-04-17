@@ -38,6 +38,9 @@ class OpenCalendarKit_Admin_ClosedDays {
 				'data-closed-event'                => true,
 				'data-closed-rule'                 => true,
 				'data-open-override'               => true,
+				'data-openkit-calendar-event-rows' => true,
+				'data-openkit-calendar-event-row'  => true,
+				'data-openkit-calendar-event-template' => true,
 			)
 		);
 
@@ -68,21 +71,30 @@ class OpenCalendarKit_Admin_ClosedDays {
 			'data-closed-event'  => true,
 			'data-closed-rule'   => true,
 			'data-open-override' => true,
+			'data-openkit-add-calendar-event' => true,
+			'data-openkit-remove-calendar-event' => true,
 		);
 
 		$allowed_html['form'] = array(
-			'id' => true,
+			'id'    => true,
+			'class' => true,
 		);
 
 		$allowed_html['label'] = array();
 
 		$allowed_html['input'] = array(
-			'type'  => true,
-			'name'  => true,
-			'value' => true,
+			'type'        => true,
+			'name'        => true,
+			'value'       => true,
+			'class'       => true,
+			'placeholder' => true,
 		);
 
 		$allowed_html['h1'] = array();
+		$allowed_html['h2'] = array();
+		$allowed_html['p']  = array(
+			'class' => true,
+		);
 
 		return $allowed_html;
 	}
@@ -633,6 +645,8 @@ class OpenCalendarKit_Admin_ClosedDays {
 					</form>
 				</div>
 			</div>
+
+			<?php echo wp_kses( OpenCalendarKit_Admin_CalendarEvents::render_admin_section(), self::get_allowed_admin_html() ); ?>
 		</div>
 		<?php
 

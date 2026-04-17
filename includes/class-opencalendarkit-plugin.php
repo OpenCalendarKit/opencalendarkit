@@ -18,7 +18,7 @@ if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.0.4' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.0' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
@@ -28,9 +28,11 @@ if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
 require_once OPENKIT_PLUGIN_PATH . 'includes/class-opencalendarkit-i18n.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Admin/class-opencalendarkit-admin-openinghours.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Admin/class-opencalendarkit-admin-closeddays.php';
+require_once OPENKIT_PLUGIN_PATH . 'includes/Admin/class-opencalendarkit-admin-calendarevents.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Admin/class-opencalendarkit-admin-eventnotice.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Admin/class-opencalendarkit-admin-settings.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-calendar.php';
+require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-calendarevent.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-openinghours.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-statustoday.php';
 require_once OPENKIT_PLUGIN_PATH . 'includes/Shortcodes/class-opencalendarkit-shortcode-eventnotice.php';
@@ -52,6 +54,7 @@ class OpenCalendarKit_Plugin {
 
 	const OPTION_OPENING_HOURS        = 'openkit_opening_hours';
 	const OPTION_OPENING_HOURS_NOTE   = 'openkit_opening_hours_note';
+	const OPTION_CALENDAR_EVENTS      = 'openkit_calendar_events';
 	const OPTION_EVENT_NOTICE_ENABLED = 'openkit_event_notice_enabled';
 	const OPTION_EVENT_NOTICE_CONTENT = 'openkit_event_notice_content';
 	const OPTION_DATA_VERSION         = 'openkit_data_version';
@@ -66,6 +69,7 @@ class OpenCalendarKit_Plugin {
 	const LEGACY_CPT_CLOSED_DAY = 'bk_closed_day';
 
 	const SHORTCODE_CALENDAR      = 'openkit_calendar';
+	const SHORTCODE_CALENDAR_EVENT = 'openkit_calendar_event';
 	const SHORTCODE_OPENING_HOURS = 'openkit_opening_hours';
 	const SHORTCODE_STATUS_TODAY  = 'openkit_status_today';
 	const SHORTCODE_EVENT_NOTICE  = 'openkit_event_notice';
@@ -83,7 +87,7 @@ class OpenCalendarKit_Plugin {
 	const NONCE_EVENT_NOTICE    = 'openkit_save_event_notice';
 	const NONCE_CLOSED_DAY_META = 'openkit_closed_day_meta';
 
-	const DATA_VERSION = '1.0.4-review-1';
+	const DATA_VERSION = '1.1.0';
 
 	/**
 	 * Register runtime hooks.
@@ -93,6 +97,7 @@ class OpenCalendarKit_Plugin {
 		add_action( 'init', array( 'OpenCalendarKit_Admin_ClosedDays', 'register_cpt' ) );
 
 		add_action( 'admin_init', array( 'OpenCalendarKit_Admin_Settings', 'register_settings' ) );
+		add_action( 'admin_init', array( 'OpenCalendarKit_Admin_CalendarEvents', 'handle_request' ) );
 		add_action( 'admin_menu', array( 'OpenCalendarKit_Admin_OpeningHours', 'register_menu' ) );
 		add_action( 'admin_menu', array( 'OpenCalendarKit_Admin_ClosedDays', 'register_menu' ) );
 		add_action( 'admin_menu', array( 'OpenCalendarKit_Admin_EventNotice', 'register_menu' ) );
@@ -105,6 +110,7 @@ class OpenCalendarKit_Plugin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
 		add_shortcode( self::SHORTCODE_CALENDAR, array( 'OpenCalendarKit_Shortcode_Calendar', 'render' ) );
+		add_shortcode( self::SHORTCODE_CALENDAR_EVENT, array( 'OpenCalendarKit_Shortcode_CalendarEvent', 'render' ) );
 		add_shortcode( self::SHORTCODE_OPENING_HOURS, array( 'OpenCalendarKit_Shortcode_OpeningHours', 'render' ) );
 		add_shortcode( self::SHORTCODE_STATUS_TODAY, array( 'OpenCalendarKit_Shortcode_StatusToday', 'render' ) );
 		add_shortcode( self::SHORTCODE_EVENT_NOTICE, array( 'OpenCalendarKit_Shortcode_EventNotice', 'render' ) );
@@ -185,6 +191,41 @@ class OpenCalendarKit_Plugin {
 	}
 
 	/**
+	 * Inject bundled JavaScript translations for the plugin's effective locale.
+	 *
+	 * WordPress resolves script translations at print time, but OpenCalendarKit
+	 * can temporarily switch to a plugin-specific locale earlier in the request.
+	 * This keeps JS translations aligned with the same effective locale.
+	 *
+	 * @param string $handle        Registered script handle.
+	 * @param string $relative_path Relative script path inside the plugin.
+	 * @return void
+	 */
+	private static function maybe_add_inline_script_translations( $handle, $relative_path ) {
+		$locale    = OpenCalendarKit_I18n::get_effective_locale();
+		$json_file = OPENKIT_PLUGIN_PATH . 'languages/' . OpenCalendarKit_I18n::TEXT_DOMAIN . '-' . $locale . '-' . md5( $relative_path ) . '.json';
+
+		if ( ! file_exists( $json_file ) ) {
+			return;
+		}
+
+		$translations = json_decode( (string) file_get_contents( $json_file ), true );
+		if (
+			! is_array( $translations ) ||
+			! isset( $translations['locale_data']['messages'] ) ||
+			! is_array( $translations['locale_data']['messages'] )
+		) {
+			return;
+		}
+
+		wp_add_inline_script(
+			$handle,
+			'wp.i18n.setLocaleData( ' . wp_json_encode( $translations['locale_data']['messages'] ) . ", '" . OpenCalendarKit_I18n::TEXT_DOMAIN . "' );",
+			'before'
+		);
+	}
+
+	/**
 	 * Enqueue public-facing assets and localized data.
 	 *
 	 * @return void
@@ -193,18 +234,19 @@ class OpenCalendarKit_Plugin {
 		OpenCalendarKit_I18n::with_locale(
 			function () {
 				wp_enqueue_style( 'open-calendar-kit', OPENKIT_PLUGIN_URL . 'assets/css/open-calendar-kit.css', array(), OPENKIT_PLUGIN_VERSION );
-				wp_enqueue_script( 'open-calendar-kit', OPENKIT_PLUGIN_URL . 'assets/js/open-calendar-kit.js', array( 'jquery' ), OPENKIT_PLUGIN_VERSION, true );
+				wp_enqueue_script( 'open-calendar-kit', OPENKIT_PLUGIN_URL . 'assets/js/open-calendar-kit.js', array( 'jquery', 'wp-i18n' ), OPENKIT_PLUGIN_VERSION, true );
 				wp_localize_script(
 					'open-calendar-kit',
 					'OPEN_CALENDAR_KIT',
 					array(
-						'ajax_url'     => admin_url( 'admin-ajax.php' ),
-						'action'       => self::AJAX_CALENDAR_MONTH,
-						'nonce'        => wp_create_nonce( self::NONCE_FRONTEND ),
-						'locale'       => OpenCalendarKit_I18n::get_js_locale(),
-						'reason_label' => __( 'Reason:', 'open-calendar-kit' ),
+						'ajax_url' => admin_url( 'admin-ajax.php' ),
+						'action'   => self::AJAX_CALENDAR_MONTH,
+						'nonce'    => wp_create_nonce( self::NONCE_FRONTEND ),
+						'locale'   => OpenCalendarKit_I18n::get_js_locale(),
 					)
 				);
+				wp_set_script_translations( 'open-calendar-kit', OpenCalendarKit_I18n::TEXT_DOMAIN, OPENKIT_PLUGIN_PATH . 'languages' );
+				self::maybe_add_inline_script_translations( 'open-calendar-kit', 'assets/js/open-calendar-kit.js' );
 			}
 		);
 	}
@@ -231,7 +273,7 @@ class OpenCalendarKit_Plugin {
 					return;
 				}
 
-				wp_enqueue_script( 'open-calendar-kit-admin', OPENKIT_PLUGIN_URL . 'assets/js/open-calendar-kit-admin.js', array( 'jquery' ), OPENKIT_PLUGIN_VERSION, true );
+				wp_enqueue_script( 'open-calendar-kit-admin', OPENKIT_PLUGIN_URL . 'assets/js/open-calendar-kit-admin.js', array( 'jquery', 'wp-i18n' ), OPENKIT_PLUGIN_VERSION, true );
 				wp_localize_script(
 					'open-calendar-kit-admin',
 					'OPEN_CALENDAR_KIT_ADMIN',
@@ -242,13 +284,10 @@ class OpenCalendarKit_Plugin {
 						'save_open_exception_action'   => self::AJAX_SAVE_OPEN_EXCEPTION,
 						'delete_open_exception_action' => self::AJAX_DELETE_OPEN_EXCEPTION,
 						'nonce'                        => wp_create_nonce( self::NONCE_ADMIN ),
-						'generic_error'                => __( 'Error', 'open-calendar-kit' ),
-						'confirm_reopen'               => __( 'Remove this closed day and mark it open again?', 'open-calendar-kit' ),
-						'open_day_exceptionally'       => __( 'Open day exceptionally', 'open-calendar-kit' ),
-						'remove_exceptional_opening'   => __( 'Remove exceptional opening', 'open-calendar-kit' ),
-						'confirm_remove_exceptional_opening' => __( 'Remove this exceptional opening and use the normal weekday rule again?', 'open-calendar-kit' ),
 					)
 				);
+				wp_set_script_translations( 'open-calendar-kit-admin', OpenCalendarKit_I18n::TEXT_DOMAIN, OPENKIT_PLUGIN_PATH . 'languages' );
+				self::maybe_add_inline_script_translations( 'open-calendar-kit-admin', 'assets/js/open-calendar-kit-admin.js' );
 			}
 		);
 	}
@@ -269,6 +308,10 @@ class OpenCalendarKit_Plugin {
 
 		if ( false === get_option( self::OPTION_OPENING_HOURS_NOTE, false ) ) {
 			add_option( self::OPTION_OPENING_HOURS_NOTE, '' );
+		}
+
+		if ( false === get_option( self::OPTION_CALENDAR_EVENTS, false ) ) {
+			add_option( self::OPTION_CALENDAR_EVENTS, array() );
 		}
 
 		if ( false === get_option( self::OPTION_EVENT_NOTICE_ENABLED, false ) ) {
