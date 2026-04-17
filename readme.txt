@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,6 +111,11 @@ Examples:
 Yes. The frontend stylesheet already uses CSS custom properties for day states, notices, and event callouts so later theme variants can build on a stable base.
 
 == Changelog ==
+
+= 1.1.2 =
+
+- Fixed the calendar-events admin form so it stays a real POST form after admin HTML sanitization.
+- Preserved the event type selector and form attributes on the calendar admin page to prevent white-screen redirects on save.
 
 = 1.1.1 =
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2
+
+- Fixed the calendar-events admin form allowlist so saving stays on the calendar page and uses POST correctly.
+- Preserved the event type selector markup inside the sanitized calendar admin screen.
+
 ## 1.1.1
 
 - Added day-specific time events with opening and closing times in the calendar-events table.

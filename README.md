@@ -94,6 +94,11 @@ The frontend stylesheet uses CSS custom properties for calendar states, notices,
 
 ## Changelog
 
+## 1.1.2
+
+- Fixed the calendar-events admin save form so it keeps the POST method on live sites.
+- Preserved the event type selector markup inside the sanitized calendar admin screen.
+
 ## 1.1.1
 
 - Added day-specific time events with opening and closing times in the calendar-events table

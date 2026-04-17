@@ -76,8 +76,10 @@ class OpenCalendarKit_Admin_ClosedDays {
 		);
 
 		$allowed_html['form'] = array(
-			'id'    => true,
-			'class' => true,
+			'id'     => true,
+			'class'  => true,
+			'method' => true,
+			'action' => true,
 		);
 
 		$allowed_html['label'] = array();
@@ -88,6 +90,17 @@ class OpenCalendarKit_Admin_ClosedDays {
 			'value'       => true,
 			'class'       => true,
 			'placeholder' => true,
+		);
+
+		$allowed_html['select'] = array(
+			'name'                     => true,
+			'class'                    => true,
+			'data-openkit-event-type'  => true,
+		);
+
+		$allowed_html['option'] = array(
+			'value'    => true,
+			'selected' => true,
 		);
 
 		$allowed_html['h1'] = array();
