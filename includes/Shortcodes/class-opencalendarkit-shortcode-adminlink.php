@@ -38,10 +38,10 @@ class OpenCalendarKit_Shortcode_AdminLink {
 						return '<span class="bkit-admin-link bkit-admin-link--denied">' . esc_html__( 'No access.', 'open-calendar-kit' ) . '</span>';
 					}
 
-					$label = self::get_logged_in_label( $target );
+					$label = self::get_button_label();
 					$url   = $admin_url;
 				} else {
-					$label = self::get_logged_out_label( $target );
+					$label = self::get_button_label();
 					$url   = wp_login_url( $admin_url );
 				}
 
@@ -89,30 +89,14 @@ class OpenCalendarKit_Shortcode_AdminLink {
 	}
 
 	/**
-	 * Return the default label for authenticated users.
+	 * Return the configured button label for the shortcode.
 	 *
-	 * @param string $target Normalized target attribute.
 	 * @return string
 	 */
-	private static function get_logged_in_label( string $target ): string {
-		if ( 'opening-hours' === $target ) {
-			return __( 'Edit opening hours', 'open-calendar-kit' );
-		}
+	private static function get_button_label(): string {
+		$label = OpenCalendarKit_Admin_Settings::get( 'admin_link_label' );
+		$label = is_string( $label ) ? trim( $label ) : '';
 
-		return __( 'Edit calendar', 'open-calendar-kit' );
-	}
-
-	/**
-	 * Return the default label for logged-out users.
-	 *
-	 * @param string $target Normalized target attribute.
-	 * @return string
-	 */
-	private static function get_logged_out_label( string $target ): string {
-		if ( 'opening-hours' === $target ) {
-			return __( 'Log in to edit opening hours', 'open-calendar-kit' );
-		}
-
-		return __( 'Log in to edit calendar', 'open-calendar-kit' );
+		return '' !== $label ? $label : OpenCalendarKit_Admin_Settings::get_default_admin_link_label();
 	}
 }

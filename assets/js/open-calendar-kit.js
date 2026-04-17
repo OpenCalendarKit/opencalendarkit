@@ -39,11 +39,12 @@
 
 	function openModalForEvent(dateISO, datePretty, eventTitle, eventText, eventMeta) {
 		var $modal = $( '.bkit-modal' );
+		var hasTitle = !! eventTitle;
 
 		hideModalPanels();
 		$modal.find( '.bkit-event-info' ).show();
 		$modal.find( '.bkit-event-date' ).text( datePretty || '' );
-		$modal.find( '.bkit-event-title' ).text( eventTitle || __( 'Event', 'open-calendar-kit' ) );
+		$modal.find( '.bkit-event-title' ).text( eventTitle || '' ).toggle( hasTitle );
 		$modal.find( '.bkit-event-meta' ).text( eventMeta || '' ).toggle( !! eventMeta );
 		$modal.find( '.bkit-event-text' ).text( eventText || '' ).toggle( !! eventText );
 

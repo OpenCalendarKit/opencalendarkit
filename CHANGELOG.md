@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+- Removed the generic "Event" popup title for text-based calendar events on the frontend.
+- Show calendar event days in the backend calendar with the same blue highlight used on the frontend.
+- Bundled the recent admin-link text setting and calendar-event save fixes into the public patch release.
+
 ## 1.1.2
 
 - Fixed the calendar-events admin form allowlist so saving stays on the calendar page and uses POST correctly.

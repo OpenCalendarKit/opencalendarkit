@@ -94,6 +94,12 @@ The frontend stylesheet uses CSS custom properties for calendar states, notices,
 
 ## Changelog
 
+## 1.1.3
+
+- Removed the generic "Event" popup title for text-based calendar events on the frontend.
+- Show calendar event days in the backend calendar with the same blue highlight used on the frontend.
+- Bundled the recent admin-link text setting and calendar-event save fixes into the public patch release.
+
 ## 1.1.2
 
 - Fixed the calendar-events admin save form so it keeps the POST method on live sites.

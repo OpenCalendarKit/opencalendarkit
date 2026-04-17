@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,6 +111,12 @@ Examples:
 Yes. The frontend stylesheet already uses CSS custom properties for day states, notices, and event callouts so later theme variants can build on a stable base.
 
 == Changelog ==
+
+= 1.1.3 =
+
+- Removed the generic "Event" popup title for text-based calendar events on the frontend.
+- Show calendar event days in the backend calendar with the same blue highlight used on the frontend.
+- Kept the previously added admin-link text setting and calendar-event save fixes together in the public release.
 
 = 1.1.2 =
 

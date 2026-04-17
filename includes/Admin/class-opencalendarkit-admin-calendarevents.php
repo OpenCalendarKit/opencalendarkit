@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class OpenCalendarKit_Admin_CalendarEvents {
 	private const NONCE_ACTION = 'openkit_save_calendar_events';
+	private const FORM_STATE_OPTION = 'openkit_calendar_events_form_state';
 	private const TYPE_TEXT    = 'text';
 	private const TYPE_TIME    = 'time';
 
@@ -44,10 +45,27 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			return;
 		}
 
-		$events = filter_input( INPUT_POST, 'openkit_calendar_events', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-		$events = is_array( $events ) ? wp_unslash( $events ) : array();
+		$events = isset( $_POST['openkit_calendar_events'] ) ? wp_unslash( $_POST['openkit_calendar_events'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized and validated in build_submission_result().
+		$events = is_array( $events ) ? $events : array();
+		$result = self::build_submission_result( $events );
 
-		update_option( OpenCalendarKit_Plugin::OPTION_CALENDAR_EVENTS, self::normalize_events( $events ) );
+		if ( ! empty( $result['errors'] ) ) {
+			self::store_form_state( $result['rows'], $result['errors'] );
+
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'                 => OpenCalendarKit_Plugin::PAGE_CALENDAR,
+						'openkit_events_error' => '1',
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+			exit;
+		}
+
+		self::clear_form_state();
+		update_option( OpenCalendarKit_Plugin::OPTION_CALENDAR_EVENTS, $result['normalized'] );
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -146,7 +164,9 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	public static function render_admin_section(): string {
-		$events         = self::get_events();
+		$form_state     = self::consume_form_state();
+		$events         = ! empty( $form_state['rows'] ) ? $form_state['rows'] : self::get_events();
+		$form_errors    = ! empty( $form_state['errors'] ) ? $form_state['errors'] : array();
 		$events_updated = filter_input( INPUT_GET, 'openkit_events_updated', FILTER_SANITIZE_SPECIAL_CHARS );
 		if ( empty( $events ) ) {
 			$events[] = array(
@@ -164,10 +184,17 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			<?php if ( is_string( $events_updated ) && '' !== $events_updated ) : ?>
 				<div class="updated"><p><?php esc_html_e( 'Calendar events saved.', 'open-calendar-kit' ); ?></p></div>
 			<?php endif; ?>
+			<?php if ( ! empty( $form_errors ) ) : ?>
+				<div class="notice notice-error">
+					<?php foreach ( $form_errors as $error_message ) : ?>
+						<p><?php echo esc_html( $error_message ); ?></p>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 
 			<h2><?php esc_html_e( 'Calendar Events', 'open-calendar-kit' ); ?></h2>
 			<p class="description">
-				<?php esc_html_e( 'Manage highlighted event dates for the frontend calendar. Each day can store either a text event or special opening hours. The shortcode [openkit_calendar_event] renders the event output for the current day or for a requested date. Only one event is stored per day; if a date is entered more than once, the last row wins.', 'open-calendar-kit' ); ?>
+				<?php esc_html_e( 'Manage highlighted event dates for the frontend calendar. Each day can store either a text event or special opening hours. Time events require an opening time; the closing time is optional. The shortcode [openkit_calendar_event] renders the event output for the current day or for a requested date. Only one event is stored per day; if a date is entered more than once, the last row wins.', 'open-calendar-kit' ); ?>
 			</p>
 
 			<form method="post" class="openkit-calendar-events__form">
@@ -210,23 +237,59 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}>
 	 */
 	private static function normalize_events( $events ): array {
+		$result = self::build_submission_result( is_array( $events ) ? $events : array() );
+
+		return $result['normalized'];
+	}
+
+	/**
+	 * Validate raw submitted rows and return sanitized results.
+	 *
+	 * @param array<int|string, array<string, mixed>> $events Raw event rows.
+	 * @return array{rows:array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}>, normalized:array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}>, errors:array<int, string>}
+	 */
+	public static function validate_submission_rows( array $events ): array {
+		return self::build_submission_result( $events );
+	}
+
+	/**
+	 * Validate raw submitted rows and return sanitized results.
+	 *
+	 * @param array<int|string, mixed> $events Raw event rows.
+	 * @return array{rows:array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}>, normalized:array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}>, errors:array<int, string>}
+	 */
+	private static function build_submission_result( array $events ): array {
 		if ( ! is_array( $events ) ) {
-			return array();
+			return array(
+				'rows'       => array(),
+				'normalized' => array(),
+				'errors'     => array(),
+			);
 		}
 
+		$rows               = array();
 		$normalized_by_date = array();
+		$errors             = array();
 
 		foreach ( $events as $event ) {
 			if ( ! is_array( $event ) ) {
 				continue;
 			}
 
-			$normalized = self::normalize_event_row( $event );
-			if ( ! is_array( $normalized ) ) {
+			$row = self::prepare_event_row( $event );
+			if ( self::is_empty_row( $row ) ) {
 				continue;
 			}
 
-			$normalized_by_date[ $normalized['date'] ] = $normalized;
+			$rows[] = $row;
+
+			$error = self::get_row_validation_error( $row );
+			if ( '' !== $error ) {
+				$errors[] = $error;
+				continue;
+			}
+
+			$normalized_by_date[ $row['date'] ] = $row;
 		}
 
 		$normalized = array_values( $normalized_by_date );
@@ -242,7 +305,11 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			}
 		);
 
-		return array_values( $normalized );
+		return array(
+			'rows'       => array_values( $rows ),
+			'normalized' => array_values( $normalized ),
+			'errors'     => array_values( array_unique( $errors ) ),
+		);
 	}
 
 	/**
@@ -310,24 +377,12 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @param array<string, mixed> $event Raw event row.
 	 * @return array{date:string,type:string,text:string,open_time:string,close_time:string}|null
 	 */
-	private static function normalize_event_row( array $event ): ?array {
+	private static function prepare_event_row( array $event ): array {
 		$date       = isset( $event['date'] ) ? sanitize_text_field( (string) $event['date'] ) : '';
 		$type       = self::normalize_type( $event['type'] ?? self::TYPE_TEXT );
 		$text       = isset( $event['text'] ) ? sanitize_text_field( (string) $event['text'] ) : '';
 		$open_time  = self::normalize_time_value( $event['open_time'] ?? '' );
 		$close_time = self::normalize_time_value( $event['close_time'] ?? '' );
-
-		if ( '' === $date || ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) ) {
-			return null;
-		}
-
-		if ( self::TYPE_TIME === $type ) {
-			if ( '' === $open_time ) {
-				return null;
-			}
-		} elseif ( '' === $text ) {
-			return null;
-		}
 
 		return array(
 			'date'       => $date,
@@ -336,6 +391,46 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			'open_time'  => $open_time,
 			'close_time' => $close_time,
 		);
+	}
+
+	/**
+	 * Check whether a sanitized row is completely empty.
+	 *
+	 * @param array{date:string,type:string,text:string,open_time:string,close_time:string} $row Sanitized row.
+	 * @return bool
+	 */
+	private static function is_empty_row( array $row ): bool {
+		return '' === $row['date'] && '' === $row['text'] && '' === $row['open_time'] && '' === $row['close_time'];
+	}
+
+	/**
+	 * Return a validation message for a row, or an empty string when valid.
+	 *
+	 * @param array{date:string,type:string,text:string,open_time:string,close_time:string} $row Sanitized row.
+	 * @return string
+	 */
+	private static function get_row_validation_error( array $row ): string {
+		if ( '' === $row['date'] ) {
+			return __( 'Each calendar event needs a date.', 'open-calendar-kit' );
+		}
+
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $row['date'] ) ) {
+			return __( 'Each calendar event needs a valid date.', 'open-calendar-kit' );
+		}
+
+		if ( self::TYPE_TIME === $row['type'] ) {
+			if ( '' === $row['open_time'] ) {
+				return __( 'Time events need an opening time. The closing time is optional.', 'open-calendar-kit' );
+			}
+
+			return '';
+		}
+
+		if ( '' === $row['text'] ) {
+			return __( 'Text events need a text.', 'open-calendar-kit' );
+		}
+
+		return '';
 	}
 
 	/**
@@ -452,5 +547,46 @@ class OpenCalendarKit_Admin_CalendarEvents {
 		}
 
 		return $date->format( $time_format );
+	}
+
+	/**
+	 * Persist submitted form state for the next admin-page load.
+	 *
+	 * @param array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}> $rows   Submitted rows.
+	 * @param array<int, string>                                                                          $errors Error messages.
+	 * @return void
+	 */
+	private static function store_form_state( array $rows, array $errors ): void {
+		update_option(
+			self::FORM_STATE_OPTION,
+			array(
+				'rows'   => array_values( $rows ),
+				'errors' => array_values( array_unique( $errors ) ),
+			)
+		);
+	}
+
+	/**
+	 * Fetch and clear submitted form state from the previous request.
+	 *
+	 * @return array{rows:array<int, array{date:string,type:string,text:string,open_time:string,close_time:string}>, errors:array<int, string>}
+	 */
+	private static function consume_form_state(): array {
+		$state = get_option( self::FORM_STATE_OPTION, array() );
+		update_option( self::FORM_STATE_OPTION, array() );
+
+		return array(
+			'rows'   => isset( $state['rows'] ) && is_array( $state['rows'] ) ? $state['rows'] : array(),
+			'errors' => isset( $state['errors'] ) && is_array( $state['errors'] ) ? $state['errors'] : array(),
+		);
+	}
+
+	/**
+	 * Clear any stored form state.
+	 *
+	 * @return void
+	 */
+	private static function clear_form_state(): void {
+		update_option( self::FORM_STATE_OPTION, array() );
 	}
 }

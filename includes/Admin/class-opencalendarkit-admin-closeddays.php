@@ -557,9 +557,11 @@ class OpenCalendarKit_Admin_ClosedDays {
 			$closed_by_rule  = ! empty( $config['closed'] );
 			$closed_by_event = self::is_closed_on( $cell_date );
 			$open_override   = self::is_open_exception_on( $cell_date );
+			$event           = OpenCalendarKit_Admin_CalendarEvents::get_event_display_data( $cell_date, OpenCalendarKit_Admin_Settings::get_time_format() );
 			$state           = ( $closed_by_event || ( $closed_by_rule && ! $open_override ) ) ? 'closed' : 'open';
 			$past            = $cell_date < $today;
 			$reason          = $closed_by_event ? self::get_reason( $cell_date ) : '';
+			$has_event       = is_array( $event ) && '' !== $event['summary'];
 
 			$cells[] = array(
 				'day'           => $day,
@@ -567,6 +569,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 				'state'         => $state,
 				'past'          => $past,
 				'reason'        => $reason,
+				'has_event'     => $has_event,
 				'closed_event'  => $closed_by_event,
 				'closed_rule'   => $closed_by_rule,
 				'open_override' => $open_override,
@@ -599,7 +602,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 				}
 
 				foreach ( $cells as $cell ) {
-					$classes = 'bkit-cell day ' . ( $cell['past'] ? 'past' : $cell['state'] );
+					$classes = 'bkit-cell day ' . ( $cell['past'] ? 'past' : $cell['state'] ) . ( $cell['has_event'] ? ' has-event event' : '' );
 					printf(
 						'<button class="%s" data-date="%s"%s%s%s%s type="button"><span class="num">%d</span></button>',
 						esc_attr( $classes ),

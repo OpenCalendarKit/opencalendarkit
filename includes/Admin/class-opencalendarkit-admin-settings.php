@@ -64,6 +64,7 @@ class OpenCalendarKit_Admin_Settings {
 			'week_starts_on'           => 'monday',
 			'time_format_mode'         => 'site_default',
 			'show_opening_hours_title' => '1',
+			'admin_link_label'         => self::get_default_admin_link_label(),
 			'plugin_locale'            => OpenCalendarKit_I18n::SITE_DEFAULT,
 		);
 	}
@@ -123,8 +124,30 @@ class OpenCalendarKit_Admin_Settings {
 			'week_starts_on'           => self::normalize_week_starts_on( $input['week_starts_on'] ?? '' ),
 			'time_format_mode'         => self::normalize_time_format_mode( $input['time_format_mode'] ?? '' ),
 			'show_opening_hours_title' => ! empty( $input['show_opening_hours_title'] ) ? '1' : '0',
+			'admin_link_label'         => self::normalize_admin_link_label( $input['admin_link_label'] ?? '' ),
 			'plugin_locale'            => OpenCalendarKit_I18n::normalize_plugin_locale( $input['plugin_locale'] ?? '' ),
 		);
+	}
+
+	/**
+	 * Return the default label for the admin-link shortcode.
+	 *
+	 * @return string
+	 */
+	public static function get_default_admin_link_label() {
+		return __( 'Admin-Login', 'open-calendar-kit' );
+	}
+
+	/**
+	 * Normalize the admin-link button label.
+	 *
+	 * @param mixed $value Candidate label.
+	 * @return string
+	 */
+	public static function normalize_admin_link_label( $value ) {
+		$value = sanitize_text_field( (string) $value );
+
+		return '' !== $value ? $value : self::get_default_admin_link_label();
 	}
 
 	/**
@@ -315,6 +338,21 @@ class OpenCalendarKit_Admin_Settings {
 										/>
 										<?php esc_html_e( 'Display the heading above opening hours unless a shortcode overrides it.', 'open-calendar-kit' ); ?>
 									</label>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php esc_html_e( 'Admin link button text', 'open-calendar-kit' ); ?></th>
+								<td>
+									<input
+										type="text"
+										id="openkit_settings_admin_link_label"
+										name="openkit_settings[admin_link_label]"
+										value="<?php echo esc_attr( $settings['admin_link_label'] ); ?>"
+										class="regular-text"
+									/>
+									<p class="description">
+										<?php esc_html_e( 'This text is used for the [openkit_admin_link] button on the frontend. Default: Admin-Login.', 'open-calendar-kit' ); ?>
+									</p>
 								</td>
 							</tr>
 							</tbody>

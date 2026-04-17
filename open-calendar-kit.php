@@ -2,7 +2,7 @@
 /**
  * Plugin Name: OpenCalendarKit
  * Description: Lightweight business-hours plugin for opening hours, status today, closed days, special opening times, and calendar events.
- * Version: 1.1.2
+ * Version: 1.1.3
  * Author: Jörn / ChatGPT
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

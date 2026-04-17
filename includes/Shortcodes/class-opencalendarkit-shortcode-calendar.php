@@ -116,13 +116,13 @@ class OpenCalendarKit_Shortcode_Calendar {
 				$time_format    = OpenCalendarKit_Admin_Settings::get_time_format();
 
 				$date              = self::normalize_month( $atts['month'], $timezone );
-				$year              = (int) $date->format( 'Y' );
-				$month             = (int) $date->format( 'n' );
-					$days_in_month = (int) $date->format( 't' );
+				$year          = (int) $date->format( 'Y' );
+				$month         = (int) $date->format( 'n' );
+				$days_in_month = (int) $date->format( 't' );
 
-					$day_zero_to_n = static function ( int $day_zero ): int {
-						return 0 === $day_zero ? 7 : $day_zero;
-					};
+				$day_zero_to_n = static function ( int $day_zero ): int {
+					return 0 === $day_zero ? 7 : $day_zero;
+				};
 
 				if ( function_exists( 'jddayofweek' ) && function_exists( 'cal_to_jd' ) ) {
 					$first_day_zero = jddayofweek( cal_to_jd( CAL_GREGORIAN, $month, 1, $year ), 0 );
@@ -229,7 +229,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 								$cell         = $cells[ $day_index++ ];
 								$has_event    = is_array( $cell['event'] ) && '' !== $cell['event']['summary'];
 								$is_clickable = $has_event || ( ! $cell['past'] && 'closed' === $cell['state'] );
-								$reason           = '';
+								$reason       = '';
 								if ( 'closed' === $cell['state'] ) {
 									$reason = OpenCalendarKit_Admin_ClosedDays::get_reason( $cell['date'] );
 								}
@@ -243,7 +243,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 									esc_attr( $cell['date'] ),
 									'' !== $reason ? ' data-reason="' . esc_attr( $reason ) . '"' : '',
 									$has_event ? ' data-event-text="' . esc_attr( 'time' === $cell['event']['type'] ? '' : $cell['event']['summary'] ) . '"' : '',
-									$has_event ? ' data-event-title="' . esc_attr( 'time' === $cell['event']['type'] ? $cell['event']['title'] : __( 'Event', 'open-calendar-kit' ) ) . '"' : '',
+									$has_event ? ' data-event-title="' . esc_attr( 'time' === $cell['event']['type'] ? $cell['event']['title'] : '' ) . '"' : '',
 									$has_event ? ' data-event-meta="' . esc_attr( $cell['event']['time_label'] ) . '"' : '',
 									$cell['past'] ? 'aria-disabled="true"' : '',
 									(int) $cell['day']
