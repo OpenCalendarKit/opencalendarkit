@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.3.11
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,38 +112,13 @@ Yes. The frontend stylesheet already uses CSS custom properties for day states, 
 
 == Changelog ==
 
-= 1.1.3.11 =
-- restore the calendar-event callout spacing to the preferred local-test variant from 1.1.3.7
+= 1.1.4 =
 
-= 1.1.3.10 =
-- slightly increase the line spacing between the event title and time in the restored calendar-event callout
-
-= 1.1.3.9 =
-- restore the previous calendar-event callout variant after the unsuccessful two-line rebuild experiment
-
-= 1.1.3.8 =
-- rebuild the calendar-event callout with clean two-line markup and tighter vertical spacing
-
-= 1.1.3.7 =
-- reduce top and bottom padding in the calendar-event callout
-
-= 1.1.3.6 =
-- simplify the calendar-event callout typography so it uses normal text flow, matching the status callout more closely
-
-= 1.1.3.5 =
-- render the calendar-event callout as one compact text block with a fixed line break between title and time
-
-= 1.1.3.4 =
-- remove the visual blank line between event title and event time in the calendar-event shortcode callout
-
-= 1.1.3.3 =
-- tighten the calendar-event shortcode callout vertically and keep it aligned with the status callout
-- restore a usable width for the calendar-event text field in the backend table
-
-= 1.1.3.2 =
-
-- Matched the `[openkit_calendar_event]` callout dimensions to the compact status-today callout.
-- Replaced the unreliable shortcode-output checkbox with an explicit Show/Calendar only selector per event.
+- added day-specific time events with opening and closing times in the calendar events table
+- updated `[openkit_status_today]` to respect time events with the priority closed day > time event > open exception > weekly opening hours
+- added the `[openkit_admin_link]` shortcode for staff login and quick backend access
+- replaced the unreliable per-event shortcode checkbox with a clear Show/Calendar only selector
+- improved the backend calendar-events table layout and the frontend calendar-event callout styling
 
 = 1.1.3 =
 
