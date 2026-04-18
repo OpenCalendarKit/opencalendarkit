@@ -52,14 +52,23 @@ class OpenCalendarKit_Shortcode_CalendarEvent {
 					return '';
 				}
 
+				if ( empty( $event['show_in_shortcode'] ) ) {
+					return '';
+				}
+
 				ob_start();
 				?>
-				<div class="bkit-calendar-event bkit-ui-callout bkit-ui-callout--calendar-event">
-					<div class="bkit-calendar-event__inner">
-						<div class="bkit-calendar-event__text"><?php echo esc_html( $event['title'] ); ?></div>
-						<?php if ( '' !== $event['time_label'] ) : ?>
-							<div class="bkit-calendar-event__meta"><?php echo esc_html( $event['time_label'] ); ?></div>
-						<?php endif; ?>
+				<div class="bkit-status-today bkit-calendar-event-callout">
+					<div class="bkit-ui-callout bkit-ui-callout--calendar-event">
+						<div class="bkit-ui-callout__inner bkit-calendar-event__inner">
+							<span class="bkit-calendar-event__text">
+								<?php echo esc_html( $event['title'] ); ?>
+								<?php if ( '' !== $event['time_label'] ) : ?>
+									<br />
+									<span class="bkit-calendar-event__meta"><?php echo esc_html( $event['time_label'] ); ?></span>
+								<?php endif; ?>
+							</span>
+						</div>
 					</div>
 				</div>
 				<?php

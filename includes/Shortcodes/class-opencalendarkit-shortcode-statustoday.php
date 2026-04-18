@@ -78,6 +78,30 @@ class OpenCalendarKit_Shortcode_StatusToday {
 	}
 
 	/**
+	 * Return the normalized opening-hours row for the current weekday.
+	 *
+	 * @param array<int, array<string, mixed>> $hours       Opening hours.
+	 * @param int                              $day_of_week Current weekday in ISO-8601 format (1-7).
+	 * @return array<string, mixed>
+	 */
+	protected static function get_hours_row_for_day( array $hours, int $day_of_week ): array {
+		if ( isset( $hours[ $day_of_week ] ) && is_array( $hours[ $day_of_week ] ) ) {
+			return $hours[ $day_of_week ];
+		}
+
+		$legacy_index = $day_of_week % 7;
+		if ( isset( $hours[ $legacy_index ] ) && is_array( $hours[ $legacy_index ] ) ) {
+			return $hours[ $legacy_index ];
+		}
+
+		return array(
+			'closed' => 1,
+			'from'   => '',
+			'to'     => '',
+		);
+	}
+
+	/**
 	 * Render the status shortcode.
 	 *
 	 * @param array<string, string> $atts Shortcode attributes.
@@ -113,11 +137,7 @@ class OpenCalendarKit_Shortcode_StatusToday {
 				$calendar_event = OpenCalendarKit_Admin_CalendarEvents::get_event( $date );
 				$open_override  = OpenCalendarKit_Admin_ClosedDays::is_open_exception_on( $date );
 				$hours          = OpenCalendarKit_Admin_OpeningHours::get_hours();
-				$row            = $hours[ $day_of_week ] ?? array(
-					'closed' => 1,
-					'from'   => '',
-					'to'     => '',
-				);
+				$row            = static::get_hours_row_for_day( $hours, $day_of_week );
 				$is_rule_closed = ! empty( $row['closed'] ) && ! $open_override;
 
 				$label = __( 'Today closed', 'open-calendar-kit' );

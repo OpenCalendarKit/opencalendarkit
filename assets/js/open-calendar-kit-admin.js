@@ -298,7 +298,8 @@
 			}
 
 			if ( $rows.find( '[data-openkit-calendar-event-row]' ).length <= 1 ) {
-				$row.find( 'input' ).val( '' );
+				$row.find( 'input[type="date"], input[type="text"], input[type="time"]' ).val( '' );
+				$row.find( 'select[name*="[show_in_shortcode]"]' ).val( '1' );
 				$row.find( '[data-openkit-event-type]' ).val( 'text' );
 				syncCalendarEventRow( $row );
 				return;
