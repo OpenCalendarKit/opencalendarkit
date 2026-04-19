@@ -26,10 +26,19 @@
 		$modal.find( '.bkit-closed-info, .bkit-event-info' ).hide();
 	}
 
+	function setEventModalColor(color) {
+		var $box = $( '.bkit-modal .bkit-modal-box' );
+		var normalizedColor = String( color || 'blue' );
+
+		$box.removeClass( 'bkit-modal-box--event-blue bkit-modal-box--event-orange bkit-modal-box--event-yellow' );
+		$box.addClass( 'bkit-modal-box--event-' + normalizedColor );
+	}
+
 	function openModalForClosed(dateISO, datePretty, reason) {
 		var $modal = $( '.bkit-modal' );
 
 		hideModalPanels();
+		setEventModalColor( '' );
 		$modal.find( '.bkit-closed-info' ).show();
 		$modal.find( '.bkit-closed-date' ).text( datePretty || '' );
 		$modal.find( '.bkit-closed-reason' ).text( reason ? (__( 'Reason:', 'open-calendar-kit' ) + ' ' + reason) : '' );
@@ -37,11 +46,12 @@
 		showModal();
 	}
 
-	function openModalForEvent(dateISO, datePretty, eventTitle, eventText, eventMeta) {
+	function openModalForEvent(dateISO, datePretty, eventTitle, eventText, eventMeta, eventColor) {
 		var $modal = $( '.bkit-modal' );
 		var hasTitle = !! eventTitle;
 
 		hideModalPanels();
+		setEventModalColor( eventColor );
 		$modal.find( '.bkit-event-info' ).show();
 		$modal.find( '.bkit-event-date' ).text( datePretty || '' );
 		$modal.find( '.bkit-event-title' ).text( eventTitle || '' ).toggle( hasTitle );
@@ -60,6 +70,7 @@
 			var eventTitle = $( this ).data( 'eventTitle' ) || '';
 			var eventText = $( this ).data( 'eventText' ) || '';
 			var eventMeta = $( this ).data( 'eventMeta' ) || '';
+			var eventColor = $( this ).data( 'eventColor' ) || 'blue';
 			var pretty;
 
 			try {
@@ -77,7 +88,7 @@
 			}
 
 			if (eventText || eventTitle) {
-				openModalForEvent( date, pretty, String( eventTitle ), String( eventText ), String( eventMeta ) );
+				openModalForEvent( date, pretty, String( eventTitle ), String( eventText ), String( eventMeta ), String( eventColor ) );
 				return;
 			}
 

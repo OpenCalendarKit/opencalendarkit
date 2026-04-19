@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,10 +35,12 @@ It helps you:
 
 OpenCalendarKit stays focused on public business information. It does not add reservations, appointments, ticketing, or other large workflows.
 
-Each calendar day can store one event. That event can be either:
+Each calendar day can store one event. That event can include:
 
-* a text event
-* a time event with special opening hours for that date
+* a text
+* an opening time
+* a closing time
+* or a practical combination of these values
 
 For the daily opening logic, the priority is:
 
@@ -84,9 +86,9 @@ You can manage:
 * text events
 * special opening times for a single date
 
-= How do time events work? =
+= How do calendar events work? =
 
-A time event stores an opening time and an optional closing time for a specific day. It is useful for days that should have different hours than the normal weekly schedule.
+A calendar event can store a text, an opening time, a closing time, or all of them together for one date. This makes it useful both for day-specific opening hours and for simple notes in the calendar.
 
 = What does the admin-link shortcode do? =
 
@@ -112,12 +114,19 @@ Yes. The frontend stylesheet already uses CSS custom properties for day states, 
 
 == Changelog ==
 
+= 1.1.5 =
+
+- simplified the calendar-events admin table by removing the event-type and shortcode-output columns
+- made calendar events flexible per day: text, opening time, closing time, or any useful combination
+- added a configurable default text for newly created calendar-event rows
+- switched calendar-event time entry to simple typed text values such as `10`, `10:00`, or `1030`
+- updated `[openkit_calendar_event]` and `[openkit_status_today]` so day-specific times also work with only an opening time or only a closing time
+
 = 1.1.4 =
 
 - added day-specific time events with opening and closing times in the calendar events table
 - updated `[openkit_status_today]` to respect time events with the priority closed day > time event > open exception > weekly opening hours
 - added the `[openkit_admin_link]` shortcode for staff login and quick backend access
-- replaced the unreliable per-event shortcode checkbox with a clear Show/Calendar only selector
 - improved the backend calendar-events table layout and the frontend calendar-event callout styling
 
 = 1.1.3 =

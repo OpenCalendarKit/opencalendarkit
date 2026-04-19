@@ -18,7 +18,7 @@ if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.1.4' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.5' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
@@ -79,6 +79,7 @@ class OpenCalendarKit_Plugin {
 	const AJAX_CALENDAR_MONTH        = 'openkit_calendar_month';
 	const AJAX_ADMIN_CALENDAR_MONTH  = 'openkit_admin_calendar_month';
 	const AJAX_SAVE_CLOSED_DAY       = 'openkit_save_closed_day';
+	const AJAX_SAVE_CLOSED_DAY_RANGE = 'openkit_save_closed_day_range';
 	const AJAX_DELETE_CLOSED_DAY     = 'openkit_delete_closed_day';
 	const AJAX_SAVE_OPEN_EXCEPTION   = 'openkit_save_open_exception';
 	const AJAX_DELETE_OPEN_EXCEPTION = 'openkit_delete_open_exception';
@@ -89,7 +90,7 @@ class OpenCalendarKit_Plugin {
 	const NONCE_EVENT_NOTICE    = 'openkit_save_event_notice';
 	const NONCE_CLOSED_DAY_META = 'openkit_closed_day_meta';
 
-	const DATA_VERSION = '1.1.4';
+	const DATA_VERSION = '1.1.5';
 
 	/**
 	 * Register runtime hooks.
@@ -283,6 +284,7 @@ class OpenCalendarKit_Plugin {
 					array(
 						'action'                       => self::AJAX_ADMIN_CALENDAR_MONTH,
 						'save_closed_day_action'       => self::AJAX_SAVE_CLOSED_DAY,
+						'save_closed_day_range_action' => self::AJAX_SAVE_CLOSED_DAY_RANGE,
 						'delete_closed_day_action'     => self::AJAX_DELETE_CLOSED_DAY,
 						'save_open_exception_action'   => self::AJAX_SAVE_OPEN_EXCEPTION,
 						'delete_open_exception_action' => self::AJAX_DELETE_OPEN_EXCEPTION,

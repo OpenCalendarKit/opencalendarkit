@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.5
+
+- simplified the calendar-events admin table by removing the event-type and shortcode-output columns
+- made calendar events flexible per day: text, opening time, closing time, or any useful combination
+- added a configurable default text for newly created calendar-event rows
+- switched calendar-event time entry to simple typed text values such as `10`, `10:00`, or `1030`
+- updated shortcode and status-today output so special times also work with only an opening time or only a closing time
+
 ## 1.1.4
 
 - added day-specific time events with opening and closing times in the calendar-events table

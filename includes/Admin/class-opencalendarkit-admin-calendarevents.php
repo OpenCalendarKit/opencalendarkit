@@ -17,6 +17,13 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	private const FORM_STATE_OPTION = 'openkit_calendar_events_form_state';
 	private const TYPE_TEXT    = 'text';
 	private const TYPE_TIME    = 'time';
+	private const COLOR_BLUE   = 'blue';
+	private const COLOR_ORANGE = 'orange';
+	private const COLOR_YELLOW = 'yellow';
+	private const PRESET_NONE         = '';
+	private const PRESET_OPENS_LATER  = 'opens_later';
+	private const PRESET_CLOSES_EARLY = 'closes_early';
+	private const PRESET_OPEN_ONLY    = 'open_only';
 
 	/**
 	 * Handle event-list form submissions on the calendar page.
@@ -123,12 +130,8 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			return '';
 		}
 
-		if ( self::TYPE_TIME === $event['type'] ) {
-			$title = self::get_event_title( $event );
-			return '' !== $title ? $title : __( 'Special opening hours', 'open-calendar-kit' );
-		}
-
-		return $event['text'];
+		$title = self::get_event_title( $event );
+		return '' !== $title ? $title : '';
 	}
 
 	/**
@@ -149,14 +152,16 @@ class OpenCalendarKit_Admin_CalendarEvents {
 		$summary    = self::get_event_summary( $event, $time_format );
 
 		return array(
-			'date'       => $event['date'],
-			'type'       => $event['type'],
-			'title'      => $title,
-			'text'       => $event['text'],
-			'time_label' => $time_label,
-			'summary'    => $summary,
-			'show_in_shortcode' => (int) ( $event['show_in_shortcode'] ?? 1 ),
-		);
+				'date'              => $event['date'],
+				'type'              => $event['type'],
+				'title'             => $title,
+				'text'              => $event['text'],
+				'text_preset'       => $event['text_preset'],
+				'time_label'        => $time_label,
+				'summary'           => $summary,
+				'color'             => $event['color'],
+				'show_in_shortcode' => 1,
+			);
 	}
 
 	/**
@@ -171,11 +176,13 @@ class OpenCalendarKit_Admin_CalendarEvents {
 		$events_updated = filter_input( INPUT_GET, 'openkit_events_updated', FILTER_SANITIZE_SPECIAL_CHARS );
 		if ( empty( $events ) ) {
 			$events[] = array(
-				'date'       => '',
-				'type'       => self::TYPE_TEXT,
-				'text'       => '',
-				'open_time'  => '',
-				'close_time' => '',
+				'date'              => '',
+				'type'              => self::TYPE_TEXT,
+				'text'              => '',
+				'text_preset'       => self::PRESET_NONE,
+				'open_time'         => '',
+				'close_time'        => '',
+				'color'             => self::COLOR_BLUE,
 				'show_in_shortcode' => 1,
 			);
 		}
@@ -195,9 +202,6 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			<?php endif; ?>
 
 			<h2><?php esc_html_e( 'Calendar Events', 'open-calendar-kit' ); ?></h2>
-			<p class="description">
-				<?php esc_html_e( 'Manage highlighted event dates for the frontend calendar. Each day can store either a text event or special opening hours. Time events require an opening time; the closing time is optional. The shortcode [openkit_calendar_event] renders the event output for the current day or for a requested date when “Show in shortcode” is enabled. Only one event is stored per day; if a date is entered more than once, the last row wins.', 'open-calendar-kit' ); ?>
-			</p>
 
 			<form method="post" class="openkit-calendar-events__form">
 				<?php wp_nonce_field( self::NONCE_ACTION, 'openkit_calendar_events_nonce' ); ?>
@@ -205,21 +209,20 @@ class OpenCalendarKit_Admin_CalendarEvents {
 				<div class="openkit-calendar-events__header">
 					<span><?php esc_html_e( 'Date', 'open-calendar-kit' ); ?></span>
 					<span><?php esc_html_e( 'Text', 'open-calendar-kit' ); ?></span>
-					<span><?php esc_html_e( 'Type', 'open-calendar-kit' ); ?></span>
 					<span><?php esc_html_e( 'Opening time', 'open-calendar-kit' ); ?></span>
 					<span><?php esc_html_e( 'Closing time', 'open-calendar-kit' ); ?></span>
-					<span><?php esc_html_e( 'Shortcode output', 'open-calendar-kit' ); ?></span>
+					<span><?php esc_html_e( 'Color', 'open-calendar-kit' ); ?></span>
 					<span><?php esc_html_e( 'Delete', 'open-calendar-kit' ); ?></span>
 				</div>
 
 				<div class="openkit-calendar-events__rows" data-openkit-calendar-event-rows="1">
 					<?php foreach ( $events as $index => $event ) : ?>
-						<?php echo self::render_event_row( (int) $index, $event['date'], $event['text'], $event['type'], $event['open_time'], $event['close_time'], (int) ( $event['show_in_shortcode'] ?? 1 ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo self::render_event_row( (int) $index, $event['date'], $event['text'], $event['text_preset'] ?? self::PRESET_NONE, $event['open_time'], $event['close_time'], $event['color'] ?? self::COLOR_BLUE ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<?php endforeach; ?>
 				</div>
 
 				<div class="openkit-calendar-events__template" data-openkit-calendar-event-template="1" style="display:none;">
-				<?php echo self::render_event_row( '__INDEX__', '', '', self::TYPE_TEXT, '', '', 1 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo self::render_event_row( '__INDEX__', '', '', self::PRESET_NONE, '', '', self::COLOR_BLUE ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div>
 
 				<div class="openkit-calendar-events__actions">
@@ -321,59 +324,64 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @param int|string $index      Row index.
 	 * @param string     $date       Event date.
 	 * @param string     $text       Event text.
-	 * @param string     $type       Event type.
 	 * @param string     $open_time  Opening time override.
-	 * @param string     $close_time        Closing time override.
-	 * @param int        $show_in_shortcode Whether the shortcode callout should render.
+	 * @param string     $close_time Closing time override.
 	 * @return string
 	 */
-	private static function render_event_row( $index, string $date, string $text, string $type, string $open_time, string $close_time, int $show_in_shortcode ): string {
-		$type = self::normalize_type( $type );
-
+	private static function render_event_row( $index, string $date, string $text, string $text_preset, string $open_time, string $close_time, string $color ): string {
 		ob_start();
 		?>
-		<div class="openkit-calendar-events__row<?php echo self::TYPE_TIME === $type ? ' is-time-event' : ''; ?>" data-openkit-calendar-event-row="1">
+		<div class="openkit-calendar-events__row" data-openkit-calendar-event-row="1">
 			<input
 				type="date"
 				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][date]"
 				value="<?php echo esc_attr( $date ); ?>"
 				class="openkit-calendar-events__date"
 			/>
+			<div class="openkit-calendar-events__text-cell">
+				<select
+					name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][text_preset]"
+					class="openkit-calendar-events__preset"
+				>
+					<?php foreach ( self::get_text_preset_options() as $preset_value => $preset_label ) : ?>
+						<option value="<?php echo esc_attr( $preset_value ); ?>" <?php selected( $text_preset, $preset_value ); ?>>
+							<?php echo esc_html( $preset_label ); ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+				<input
+					type="text"
+					name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][text]"
+					value="<?php echo esc_attr( $text ); ?>"
+					class="openkit-calendar-events__text"
+					placeholder="<?php echo esc_attr__( 'Individual text (optional)', 'open-calendar-kit' ); ?>"
+				/>
+			</div>
 			<input
 				type="text"
-				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][text]"
-				value="<?php echo esc_attr( $text ); ?>"
-				class="regular-text openkit-calendar-events__text"
-				placeholder="<?php echo esc_attr__( 'Event text', 'open-calendar-kit' ); ?>"
-			/>
-			<select
-				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][type]"
-				class="openkit-calendar-events__type"
-				data-openkit-event-type="1"
-			>
-				<option value="<?php echo esc_attr( self::TYPE_TEXT ); ?>"<?php selected( $type, self::TYPE_TEXT ); ?>><?php esc_html_e( 'Text', 'open-calendar-kit' ); ?></option>
-				<option value="<?php echo esc_attr( self::TYPE_TIME ); ?>"<?php selected( $type, self::TYPE_TIME ); ?>><?php esc_html_e( 'Time', 'open-calendar-kit' ); ?></option>
-			</select>
-			<input
-				type="time"
 				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][open_time]"
 				value="<?php echo esc_attr( $open_time ); ?>"
 				class="openkit-calendar-events__time openkit-calendar-events__time--open"
-				data-openkit-event-open-time="1"
+				inputmode="numeric"
+				placeholder="<?php echo esc_attr__( 'hh:mm', 'open-calendar-kit' ); ?>"
 			/>
 			<input
-				type="time"
+				type="text"
 				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][close_time]"
 				value="<?php echo esc_attr( $close_time ); ?>"
 				class="openkit-calendar-events__time openkit-calendar-events__time--close"
-				data-openkit-event-close-time="1"
+				inputmode="numeric"
+				placeholder="<?php echo esc_attr__( 'hh:mm', 'open-calendar-kit' ); ?>"
 			/>
 			<select
-				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][show_in_shortcode]"
-				class="openkit-calendar-events__visibility"
+				name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][color]"
+				class="openkit-calendar-events__color"
 			>
-				<option value="1"<?php selected( 1, $show_in_shortcode ); ?>><?php esc_html_e( 'Show', 'open-calendar-kit' ); ?></option>
-				<option value="0"<?php selected( 0, $show_in_shortcode ); ?>><?php esc_html_e( 'Calendar only', 'open-calendar-kit' ); ?></option>
+				<?php foreach ( self::get_color_options() as $color_value => $color_label ) : ?>
+					<option value="<?php echo esc_attr( $color_value ); ?>" <?php selected( $color, $color_value ); ?>>
+						<?php echo esc_html( $color_label ); ?>
+					</option>
+				<?php endforeach; ?>
 			</select>
 			<button type="button" class="button-link-delete openkit-calendar-events__remove" data-openkit-remove-calendar-event="1" aria-label="<?php echo esc_attr__( 'Delete event row', 'open-calendar-kit' ); ?>">×</button>
 		</div>
@@ -391,18 +399,21 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	private static function prepare_event_row( array $event ): array {
 		$date       = isset( $event['date'] ) ? sanitize_text_field( (string) $event['date'] ) : '';
 		$text       = isset( $event['text'] ) ? sanitize_text_field( (string) $event['text'] ) : '';
+		$text_preset = self::normalize_text_preset( $event['text_preset'] ?? self::PRESET_NONE );
 		$open_time  = self::normalize_time_value( $event['open_time'] ?? '' );
 		$close_time = self::normalize_time_value( $event['close_time'] ?? '' );
 		$type       = self::normalize_type( $event['type'] ?? self::TYPE_TEXT, $open_time, $close_time );
-		$show_in_shortcode = self::normalize_checkbox_value( $event['show_in_shortcode'] ?? 1 );
+		$color      = self::normalize_color( $event['color'] ?? self::COLOR_BLUE );
 
 		return array(
-			'date'       => $date,
-			'type'       => $type,
-			'text'       => $text,
-			'open_time'  => $open_time,
-			'close_time' => $close_time,
-			'show_in_shortcode' => $show_in_shortcode,
+			'date'              => $date,
+			'type'              => $type,
+			'text'              => $text,
+			'text_preset'       => $text_preset,
+			'open_time'         => $open_time,
+			'close_time'        => $close_time,
+			'color'             => $color,
+			'show_in_shortcode' => 1,
 		);
 	}
 
@@ -413,7 +424,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return bool
 	 */
 	private static function is_empty_row( array $row ): bool {
-		return '' === $row['date'] && '' === $row['text'] && '' === $row['open_time'] && '' === $row['close_time'];
+		return '' === $row['date'] && '' === $row['text'] && '' === $row['text_preset'] && '' === $row['open_time'] && '' === $row['close_time'];
 	}
 
 	/**
@@ -431,19 +442,44 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			return __( 'Each calendar event needs a valid date.', 'open-calendar-kit' );
 		}
 
-		if ( self::TYPE_TIME === $row['type'] ) {
-			if ( '' === $row['open_time'] ) {
-				return __( 'Time events need an opening time. The closing time is optional.', 'open-calendar-kit' );
-			}
-
-			return '';
-		}
-
-		if ( '' === $row['text'] ) {
-			return __( 'Text events need a text.', 'open-calendar-kit' );
+		if ( '' === $row['text'] && '' === $row['text_preset'] && '' === $row['open_time'] && '' === $row['close_time'] ) {
+			return __( 'Each calendar event needs a text preset, individual text, an opening time, a closing time, or a combination of these values.', 'open-calendar-kit' );
 		}
 
 		return '';
+	}
+
+	/**
+	 * Normalize a text preset key.
+	 *
+	 * @param mixed $value Raw preset value.
+	 * @return string
+	 */
+	private static function normalize_text_preset( $value ): string {
+		$value = sanitize_key( (string) $value );
+		$text_blocks = OpenCalendarKit_Admin_Settings::get_calendar_event_text_blocks();
+
+		if ( '' !== $value && isset( $text_blocks[ $value ] ) ) {
+			return $value;
+		}
+
+		return self::PRESET_NONE;
+	}
+
+	/**
+	 * Normalize an event color.
+	 *
+	 * @param mixed $value Raw color value.
+	 * @return string
+	 */
+	private static function normalize_color( $value ): string {
+		$value = sanitize_key( (string) $value );
+
+		if ( in_array( $value, array( self::COLOR_BLUE, self::COLOR_ORANGE, self::COLOR_YELLOW ), true ) ) {
+			return $value;
+		}
+
+		return self::COLOR_BLUE;
 	}
 
 	/**
@@ -474,22 +510,39 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	private static function normalize_time_value( $time ): string {
-		$time = sanitize_text_field( (string) $time );
+		$time = trim( sanitize_text_field( (string) $time ) );
+		if ( '' === $time ) {
+			return '';
+		}
+
+		if ( preg_match( '/^\d{1,2}$/', $time ) ) {
+			$hour = (int) $time;
+			if ( $hour >= 0 && $hour <= 23 ) {
+				return sprintf( '%02d:00', $hour );
+			}
+		}
+
+		if ( preg_match( '/^(\d{1,2}):(\d{1,2})$/', $time, $matches ) ) {
+			$hour   = (int) $matches[1];
+			$minute = (int) $matches[2];
+			if ( $hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59 ) {
+				return sprintf( '%02d:%02d', $hour, $minute );
+			}
+		}
+
+		if ( preg_match( '/^(\d{1,2})(\d{2})$/', $time, $matches ) ) {
+			$hour   = (int) $matches[1];
+			$minute = (int) $matches[2];
+			if ( $hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59 ) {
+				return sprintf( '%02d:%02d', $hour, $minute );
+			}
+		}
+
 		if ( preg_match( '/^\d{2}:\d{2}(?::\d{2})?$/', $time ) ) {
 			return substr( $time, 0, 5 );
 		}
 
 		return '';
-	}
-
-	/**
-	 * Normalize checkbox-like values to a strict 1/0 integer.
-	 *
-	 * @param mixed $value Raw checkbox value.
-	 * @return int
-	 */
-	private static function normalize_checkbox_value( $value ): int {
-		return ! empty( $value ) ? 1 : 0;
 	}
 
 	/**
@@ -499,12 +552,29 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	public static function get_event_title( array $event ): string {
-		if ( self::TYPE_TIME === ( $event['type'] ?? self::TYPE_TEXT ) ) {
-			$text = trim( (string) ( $event['text'] ?? '' ) );
-			return '' !== $text ? $text : __( 'Special opening hours', 'open-calendar-kit' );
+		$text = trim( (string) ( $event['text'] ?? '' ) );
+		if ( '' !== $text ) {
+			return $text;
 		}
 
-		return (string) ( $event['text'] ?? '' );
+		$preset = self::normalize_text_preset( $event['text_preset'] ?? self::PRESET_NONE );
+		if ( self::PRESET_NONE !== $preset ) {
+			return self::get_preset_label( $preset );
+		}
+
+		if ( '' !== (string) ( $event['open_time'] ?? '' ) && '' !== (string) ( $event['close_time'] ?? '' ) ) {
+			return self::get_preset_label( self::PRESET_OPEN_ONLY );
+		}
+
+		if ( '' !== (string) ( $event['open_time'] ?? '' ) ) {
+			return self::get_preset_label( self::PRESET_OPENS_LATER );
+		}
+
+		if ( '' !== (string) ( $event['close_time'] ?? '' ) ) {
+			return self::get_preset_label( self::PRESET_CLOSES_EARLY );
+		}
+
+		return '';
 	}
 
 	/**
@@ -515,24 +585,23 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	public static function get_time_range_label( array $event, string $time_format ): string {
-		if ( self::TYPE_TIME !== ( $event['type'] ?? self::TYPE_TEXT ) ) {
-			return '';
-		}
-
 		$open_time  = self::format_time_value( (string) ( $event['open_time'] ?? '' ), $time_format );
 		$close_time = self::format_time_value( (string) ( $event['close_time'] ?? '' ), $time_format );
 
-		if ( '' === $open_time ) {
-			return '';
-		}
-
-		if ( '' !== $close_time ) {
+		if ( '' !== $open_time && '' !== $close_time ) {
 			/* translators: 1: opening time, 2: closing time. */
 			return sprintf( __( '%1$s to %2$s', 'open-calendar-kit' ), $open_time, $close_time );
 		}
 
-		/* translators: %s: opening time. */
-		return sprintf( __( 'from %s', 'open-calendar-kit' ), $open_time );
+		if ( '' !== $open_time ) {
+			return $open_time;
+		}
+
+		if ( '' !== $close_time ) {
+			return $close_time;
+		}
+
+		return '';
 	}
 
 	/**
@@ -543,24 +612,84 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	public static function get_event_summary( array $event, string $time_format ): string {
-		if ( self::TYPE_TIME !== ( $event['type'] ?? self::TYPE_TEXT ) ) {
-			return (string) ( $event['text'] ?? '' );
-		}
-
 		$title      = self::get_event_title( $event );
 		$time_label = self::get_time_range_label( $event, $time_format );
 
-		if ( '' !== trim( (string) ( $event['text'] ?? '' ) ) && '' !== $time_label ) {
+		if ( '' !== $title && '' !== $time_label ) {
 			/* translators: 1: event title, 2: time range. */
 			return sprintf( __( '%1$s (%2$s)', 'open-calendar-kit' ), $title, $time_label );
 		}
 
-		if ( '' !== $time_label ) {
-			/* translators: %s: time range for a special opening day. */
-			return sprintf( __( 'Special opening hours: %s', 'open-calendar-kit' ), $time_label );
+		return $title;
+	}
+
+	/**
+	 * Return the available text-preset options.
+	 *
+	 * @return array<string, string>
+	 */
+	private static function get_text_preset_options(): array {
+		$text_blocks = OpenCalendarKit_Admin_Settings::get_calendar_event_text_blocks();
+		$options     = array(
+			self::PRESET_NONE => __( 'No preset', 'open-calendar-kit' ),
+		);
+
+		foreach ( $text_blocks as $preset_key => $preset_label ) {
+			if ( '' === (string) $preset_key || '' === trim( (string) $preset_label ) ) {
+				continue;
+			}
+
+			$options[ (string) $preset_key ] = (string) $preset_label;
 		}
 
-		return $title;
+		return $options;
+	}
+
+	/**
+	 * Return the available event colors.
+	 *
+	 * @return array<string, string>
+	 */
+	private static function get_color_options(): array {
+		return array(
+			self::COLOR_BLUE   => __( 'Blue', 'open-calendar-kit' ),
+			self::COLOR_ORANGE => __( 'Orange', 'open-calendar-kit' ),
+			self::COLOR_YELLOW => __( 'Yellow', 'open-calendar-kit' ),
+		);
+	}
+
+	/**
+	 * Return the human-readable label for a preset.
+	 *
+	 * @param string $preset Preset key.
+	 * @return string
+	 */
+	private static function get_preset_label( string $preset ): string {
+		$text_blocks = OpenCalendarKit_Admin_Settings::get_calendar_event_text_blocks();
+		if ( isset( $text_blocks[ $preset ] ) ) {
+			return $text_blocks[ $preset ];
+		}
+
+		switch ( $preset ) {
+			case self::PRESET_OPENS_LATER:
+				return OpenCalendarKit_Admin_Settings::get_default_calendar_event_text_opens_later();
+			case self::PRESET_CLOSES_EARLY:
+				return OpenCalendarKit_Admin_Settings::get_default_calendar_event_text_closes_early();
+			case self::PRESET_OPEN_ONLY:
+				return OpenCalendarKit_Admin_Settings::get_default_calendar_event_text_open_only();
+			default:
+				return '';
+		}
+	}
+
+	/**
+	 * Check whether an event row carries special opening times.
+	 *
+	 * @param array{date:string,type:string,text:string,open_time:string,close_time:string,show_in_shortcode:int} $event Event row.
+	 * @return bool
+	 */
+	public static function has_special_times( array $event ): bool {
+		return '' !== (string) ( $event['open_time'] ?? '' ) || '' !== (string) ( $event['close_time'] ?? '' );
 	}
 
 	/**

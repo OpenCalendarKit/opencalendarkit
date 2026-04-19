@@ -234,17 +234,19 @@ class OpenCalendarKit_Shortcode_Calendar {
 									$reason = OpenCalendarKit_Admin_ClosedDays::get_reason( $cell['date'] );
 								}
 
-								$classes = 'bkit-cell day ' . ( $cell['past'] ? 'past disabled' : $cell['state'] ) . ( $has_event ? ' has-event event' : '' ) . ( $is_clickable ? ' clickable' : '' );
+								$event_color = $has_event && ! empty( $cell['event']['color'] ) ? sanitize_html_class( (string) $cell['event']['color'] ) : 'blue';
+								$classes     = 'bkit-cell day ' . ( $cell['past'] ? 'past disabled' : $cell['state'] ) . ( $has_event ? ' has-event event event-color-' . $event_color : '' ) . ( $is_clickable ? ' clickable' : '' );
 
 								echo '<td class="bkit-td">';
 								printf(
-									'<button class="%s" data-date="%s"%s%s%s%s type="button" %s><span class="num">%d</span></button>',
+									'<button class="%s" data-date="%s"%s%s%s%s%s type="button" %s><span class="num">%d</span></button>',
 									esc_attr( $classes ),
 									esc_attr( $cell['date'] ),
 									'' !== $reason ? ' data-reason="' . esc_attr( $reason ) . '"' : '',
-									$has_event ? ' data-event-text="' . esc_attr( 'time' === $cell['event']['type'] ? '' : $cell['event']['summary'] ) . '"' : '',
-									$has_event ? ' data-event-title="' . esc_attr( 'time' === $cell['event']['type'] ? $cell['event']['title'] : '' ) . '"' : '',
+									$has_event ? ' data-event-text="' . esc_attr( '' ) . '"' : '',
+									$has_event ? ' data-event-title="' . esc_attr( $cell['event']['title'] ) . '"' : '',
 									$has_event ? ' data-event-meta="' . esc_attr( $cell['event']['time_label'] ) . '"' : '',
+									$has_event ? ' data-event-color="' . esc_attr( $event_color ) . '"' : '',
 									$cell['past'] ? 'aria-disabled="true"' : '',
 									(int) $cell['day']
 								);

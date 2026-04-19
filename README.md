@@ -43,12 +43,14 @@ If the user is logged out, the shortcode links to `wp-login.php` and redirects t
 
 ## Calendar Events
 
-Each day can store one calendar event. That event can be either:
+Each day can store one calendar event. That event can include:
 
-- a text event
-- a time event with special opening hours for that day
+- a text
+- an opening time
+- a closing time
+- or a practical combination of these values
 
-Time events add day-specific opening times on top of the normal weekly schedule. The priority is:
+Day-specific times override the normal weekly schedule with this priority:
 
 1. Closed day
 2. Time event
@@ -94,12 +96,19 @@ The frontend stylesheet uses CSS custom properties for calendar states, notices,
 
 ## Changelog
 
+## 1.1.5
+
+- simplified the calendar-events admin table by removing the event-type and shortcode-output columns
+- made calendar events flexible per day: text, opening time, closing time, or any useful combination
+- added a configurable default text for newly created calendar-event rows
+- switched calendar-event time entry to simple typed text values such as `10`, `10:00`, or `1030`
+- updated `[openkit_calendar_event]` and `[openkit_status_today]` so day-specific times also work with only an opening time or only a closing time
+
 ## 1.1.4
 
 - added day-specific time events with opening and closing times in the calendar-events table
 - updated `[openkit_status_today]` to respect the priority closed day > time event > open exception > weekly opening hours
 - added the `[openkit_admin_link]` shortcode for staff login and quick backend access
-- replaced the unreliable per-event shortcode-output checkbox with a clear Show/Calendar only selector
 - improved the backend calendar-events table layout and the frontend calendar-event callout styling
 
 ## 1.1.3

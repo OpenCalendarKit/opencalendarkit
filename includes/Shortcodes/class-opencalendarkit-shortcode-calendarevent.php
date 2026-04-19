@@ -52,14 +52,10 @@ class OpenCalendarKit_Shortcode_CalendarEvent {
 					return '';
 				}
 
-				if ( empty( $event['show_in_shortcode'] ) ) {
-					return '';
-				}
-
 				ob_start();
 				?>
-				<div class="bkit-status-today bkit-calendar-event-callout">
-					<div class="bkit-ui-callout bkit-ui-callout--calendar-event">
+				<div class="bkit-status-today bkit-calendar-event-callout bkit-calendar-event-callout--<?php echo esc_attr( $event['color'] ); ?>">
+					<div class="bkit-ui-callout bkit-ui-callout--calendar-event bkit-ui-callout--calendar-event-<?php echo esc_attr( $event['color'] ); ?>">
 						<div class="bkit-ui-callout__inner bkit-calendar-event__inner">
 							<span class="bkit-calendar-event__text">
 								<?php echo esc_html( $event['title'] ); ?>

@@ -41,6 +41,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 				'data-openkit-calendar-event-rows' => true,
 				'data-openkit-calendar-event-row'  => true,
 				'data-openkit-calendar-event-template' => true,
+				'data-openkit-bulk-closed-panel'   => true,
 			)
 		);
 
@@ -90,6 +91,8 @@ class OpenCalendarKit_Admin_ClosedDays {
 			'value'       => true,
 			'class'       => true,
 			'placeholder' => true,
+			'id'          => true,
+			'checked'     => true,
 		);
 
 		$allowed_html['select'] = array(
@@ -206,6 +209,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 				add_action( 'pre_get_posts', array( __CLASS__, 'default_order' ) );
 
 				add_action( 'wp_ajax_' . OpenCalendarKit_Plugin::AJAX_SAVE_CLOSED_DAY, array( __CLASS__, 'ajax_save' ) );
+				add_action( 'wp_ajax_' . OpenCalendarKit_Plugin::AJAX_SAVE_CLOSED_DAY_RANGE, array( __CLASS__, 'ajax_save_range' ) );
 				add_action( 'wp_ajax_' . OpenCalendarKit_Plugin::AJAX_DELETE_CLOSED_DAY, array( __CLASS__, 'ajax_delete' ) );
 				add_action( 'wp_ajax_' . OpenCalendarKit_Plugin::AJAX_SAVE_OPEN_EXCEPTION, array( __CLASS__, 'ajax_save_open_exception' ) );
 				add_action( 'wp_ajax_' . OpenCalendarKit_Plugin::AJAX_DELETE_OPEN_EXCEPTION, array( __CLASS__, 'ajax_delete_open_exception' ) );
@@ -449,6 +453,54 @@ class OpenCalendarKit_Admin_ClosedDays {
 	}
 
 	/**
+	 * Create or update a closed-day exception for a date.
+	 *
+	 * @param string $date   Date in Y-m-d format.
+	 * @param string $reason Optional reason.
+	 * @return int
+	 */
+	private static function save_closed_day_exception( string $date, string $reason ): int {
+		$post_id = self::find_exception_post_id( $date, self::STATE_CLOSED );
+		if ( $post_id ) {
+			update_post_meta( $post_id, '_bk_reason', $reason );
+			update_post_meta( $post_id, '_bk_state', self::STATE_CLOSED );
+
+			if ( empty( get_the_title( $post_id ) ) ) {
+				wp_update_post(
+					array(
+						'ID'         => $post_id,
+						'post_title' => self::build_exception_title( $date, self::STATE_CLOSED ),
+					)
+				);
+			}
+		} else {
+			$post_id = (int) wp_insert_post(
+				array(
+					'post_type'   => OpenCalendarKit_Plugin::CPT_CLOSED_DAY,
+					'post_status' => 'publish',
+					'post_title'  => self::build_exception_title( $date, self::STATE_CLOSED ),
+				),
+				true
+			);
+
+			if ( is_wp_error( $post_id ) || ! $post_id ) {
+				return 0;
+			}
+
+			update_post_meta( $post_id, '_bk_date', $date );
+			update_post_meta( $post_id, '_bk_reason', $reason );
+			update_post_meta( $post_id, '_bk_state', self::STATE_CLOSED );
+		}
+
+		$open_override_post_id = self::find_exception_post_id( $date, self::STATE_OPEN );
+		if ( $open_override_post_id ) {
+			wp_delete_post( $open_override_post_id, true );
+		}
+
+		return (int) $post_id;
+	}
+
+	/**
 	 * Determine whether a date is explicitly marked closed.
 	 *
 	 * @param string $date Date in Y-m-d format.
@@ -562,6 +614,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 			$past            = $cell_date < $today;
 			$reason          = $closed_by_event ? self::get_reason( $cell_date ) : '';
 			$has_event       = is_array( $event ) && '' !== $event['summary'];
+			$event_color     = $has_event && ! empty( $event['color'] ) ? sanitize_html_class( (string) $event['color'] ) : 'blue';
 
 			$cells[] = array(
 				'day'           => $day,
@@ -573,6 +626,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 				'closed_event'  => $closed_by_event,
 				'closed_rule'   => $closed_by_rule,
 				'open_override' => $open_override,
+				'event_color'   => $event_color,
 			);
 		}
 
@@ -602,7 +656,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 				}
 
 				foreach ( $cells as $cell ) {
-					$classes = 'bkit-cell day ' . ( $cell['past'] ? 'past' : $cell['state'] ) . ( $cell['has_event'] ? ' has-event event' : '' );
+					$classes = 'bkit-cell day ' . ( $cell['past'] ? 'past' : $cell['state'] ) . ( $cell['has_event'] ? ' has-event event event-color-' . $cell['event_color'] : '' );
 					printf(
 						'<button class="%s" data-date="%s"%s%s%s%s type="button"><span class="num">%d</span></button>',
 						esc_attr( $classes ),
@@ -633,6 +687,32 @@ class OpenCalendarKit_Admin_ClosedDays {
 		?>
 		<div class="wrap" data-openkit-admin-calendar-root="1">
 			<h1><?php echo esc_html__( 'Calendar', 'open-calendar-kit' ); ?></h1>
+			<div class="openkit-bulk-closed-days">
+				<label class="openkit-bulk-closed-days__toggle">
+					<input type="checkbox" id="openkit_bulk_closed_days_toggle" />
+					<?php esc_html_e( 'Enter closed days for multiple dates', 'open-calendar-kit' ); ?>
+				</label>
+				<div class="openkit-bulk-closed-days__panel" data-openkit-bulk-closed-panel="1">
+					<div class="openkit-bulk-closed-days__fields">
+						<div class="openkit-bulk-closed-days__field">
+							<label for="openkit_bulk_closed_days_from"><?php esc_html_e( 'From', 'open-calendar-kit' ); ?></label>
+							<input type="date" id="openkit_bulk_closed_days_from" />
+						</div>
+						<div class="openkit-bulk-closed-days__field">
+							<label for="openkit_bulk_closed_days_to"><?php esc_html_e( 'To', 'open-calendar-kit' ); ?></label>
+							<input type="date" id="openkit_bulk_closed_days_to" />
+						</div>
+						<div class="openkit-bulk-closed-days__field openkit-bulk-closed-days__field--reason">
+							<label for="openkit_bulk_closed_days_reason"><?php esc_html_e( 'Reason', 'open-calendar-kit' ); ?></label>
+							<input type="text" id="openkit_bulk_closed_days_reason" value="" />
+						</div>
+					</div>
+					<div class="openkit-bulk-closed-days__actions">
+						<button type="button" class="button button-primary" id="openkit_save_closed_day_range"><?php esc_html_e( 'Save closed days', 'open-calendar-kit' ); ?></button>
+					</div>
+					<div class="openkit-bulk-closed-days__feedback bkit-feedback" style="display:none;"></div>
+				</div>
+			</div>
 			<?php echo wp_kses( self::render_calendar_markup( $month ), self::get_allowed_admin_html() ); ?>
 			<div id="bkit-closedday-modal" class="bkit-modal" style="display:none;">
 				<div class="bkit-modal-box">
@@ -733,48 +813,70 @@ class OpenCalendarKit_Admin_ClosedDays {
 
 				$post_id = self::find_exception_post_id( $date, self::STATE_CLOSED );
 				if ( $post_id ) {
-					update_post_meta( $post_id, '_bk_reason', $reason );
-					update_post_meta( $post_id, '_bk_state', self::STATE_CLOSED );
-					if ( empty( get_the_title( $post_id ) ) ) {
-						wp_update_post(
-							array(
-								'ID'         => $post_id,
-								'post_title' => self::build_exception_title( $date, self::STATE_CLOSED ),
-							)
-						);
-					}
-
-					$open_override_post_id = self::find_exception_post_id( $date, self::STATE_OPEN );
-					if ( $open_override_post_id ) {
-						wp_delete_post( $open_override_post_id, true );
-					}
-
+					self::save_closed_day_exception( $date, $reason );
 					wp_send_json_success( array( 'msg' => __( 'Updated closed day', 'open-calendar-kit' ) ) );
 				}
 
-				$post_id = wp_insert_post(
-					array(
-						'post_type'   => OpenCalendarKit_Plugin::CPT_CLOSED_DAY,
-						'post_status' => 'publish',
-						'post_title'  => self::build_exception_title( $date, self::STATE_CLOSED ),
-					),
-					true
-				);
-
-				if ( is_wp_error( $post_id ) ) {
-					wp_send_json_error( array( 'msg' => $post_id->get_error_message() ), 500 );
-				}
-
-				update_post_meta( $post_id, '_bk_date', $date );
-				update_post_meta( $post_id, '_bk_reason', $reason );
-				update_post_meta( $post_id, '_bk_state', self::STATE_CLOSED );
-
-				$open_override_post_id = self::find_exception_post_id( $date, self::STATE_OPEN );
-				if ( $open_override_post_id ) {
-					wp_delete_post( $open_override_post_id, true );
+				$post_id = self::save_closed_day_exception( $date, $reason );
+				if ( ! $post_id ) {
+					wp_send_json_error( array( 'msg' => __( 'Could not create closed day', 'open-calendar-kit' ) ), 500 );
 				}
 
 				wp_send_json_success( array( 'msg' => __( 'Created closed day', 'open-calendar-kit' ) ) );
+			}
+		);
+	}
+
+	/**
+	 * Save a closed-day range over AJAX.
+	 *
+	 * @return void
+	 */
+	public static function ajax_save_range() {
+		OpenCalendarKit_I18n::with_locale(
+			function () {
+				check_ajax_referer( OpenCalendarKit_Plugin::NONCE_ADMIN, 'nonce' );
+
+				if ( ! current_user_can( OpenCalendarKit_Plugin::CAP_MANAGE ) ) {
+					wp_send_json_error( array( 'msg' => __( 'Not allowed', 'open-calendar-kit' ) ), 403 );
+				}
+
+				$date_from = isset( $_POST['date_from'] ) ? sanitize_text_field( wp_unslash( $_POST['date_from'] ) ) : '';
+				$date_to   = isset( $_POST['date_to'] ) ? sanitize_text_field( wp_unslash( $_POST['date_to'] ) ) : '';
+				$reason    = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
+
+				if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date_from ) || ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date_to ) ) {
+					wp_send_json_error( array( 'msg' => __( 'Please enter a valid start and end date.', 'open-calendar-kit' ) ), 400 );
+				}
+
+				try {
+					$start = new DateTimeImmutable( $date_from, wp_timezone() );
+					$end   = new DateTimeImmutable( $date_to, wp_timezone() );
+				} catch ( Exception $exception ) {
+					wp_send_json_error( array( 'msg' => __( 'Please enter a valid date range.', 'open-calendar-kit' ) ), 400 );
+				}
+
+				if ( $end < $start ) {
+					wp_send_json_error( array( 'msg' => __( 'The end date must be on or after the start date.', 'open-calendar-kit' ) ), 400 );
+				}
+
+				$total_days = (int) $start->diff( $end )->format( '%a' ) + 1;
+				if ( $total_days > 366 ) {
+					wp_send_json_error( array( 'msg' => __( 'Please save at most one year of closed days at a time.', 'open-calendar-kit' ) ), 400 );
+				}
+
+				$saved     = 0;
+				$range_end = $end->modify( '+1 day' );
+				$period    = new DatePeriod( $start, new DateInterval( 'P1D' ), $range_end );
+
+				foreach ( $period as $date ) {
+					if ( self::save_closed_day_exception( $date->format( 'Y-m-d' ), $reason ) ) {
+						++$saved;
+					}
+				}
+
+				/* translators: %d: number of saved closed days. */
+				wp_send_json_success( array( 'msg' => sprintf( __( 'Saved %d closed days.', 'open-calendar-kit' ), $saved ) ) );
 			}
 		);
 	}

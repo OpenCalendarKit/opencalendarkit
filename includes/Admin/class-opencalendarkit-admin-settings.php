@@ -65,6 +65,7 @@ class OpenCalendarKit_Admin_Settings {
 			'time_format_mode'         => 'site_default',
 			'show_opening_hours_title' => '1',
 			'admin_link_label'         => self::get_default_admin_link_label(),
+			'calendar_event_text_blocks' => self::get_default_calendar_event_text_blocks(),
 			'plugin_locale'            => OpenCalendarKit_I18n::SITE_DEFAULT,
 		);
 	}
@@ -84,7 +85,13 @@ class OpenCalendarKit_Admin_Settings {
 			$settings = array();
 		}
 
-		return wp_parse_args( $settings, self::defaults() );
+		$settings = wp_parse_args( $settings, self::defaults() );
+		$settings['calendar_event_text_blocks'] = self::normalize_calendar_event_text_blocks(
+			$settings['calendar_event_text_blocks'] ?? self::build_legacy_calendar_event_text_blocks( $settings ),
+			self::build_legacy_calendar_event_text_blocks( $settings )
+		);
+
+		return $settings;
 	}
 
 	/**
@@ -125,6 +132,10 @@ class OpenCalendarKit_Admin_Settings {
 			'time_format_mode'         => self::normalize_time_format_mode( $input['time_format_mode'] ?? '' ),
 			'show_opening_hours_title' => ! empty( $input['show_opening_hours_title'] ) ? '1' : '0',
 			'admin_link_label'         => self::normalize_admin_link_label( $input['admin_link_label'] ?? '' ),
+			'calendar_event_text_blocks' => self::normalize_calendar_event_text_blocks(
+				$input['calendar_event_text_blocks'] ?? array(),
+				self::build_legacy_calendar_event_text_blocks( is_array( $input ) ? $input : array() )
+			),
 			'plugin_locale'            => OpenCalendarKit_I18n::normalize_plugin_locale( $input['plugin_locale'] ?? '' ),
 		);
 	}
@@ -148,6 +159,228 @@ class OpenCalendarKit_Admin_Settings {
 		$value = sanitize_text_field( (string) $value );
 
 		return '' !== $value ? $value : self::get_default_admin_link_label();
+	}
+
+	/**
+	 * Return the default text for "opens later" time events.
+	 *
+	 * @return string
+	 */
+	public static function get_default_calendar_event_text_opens_later() {
+		return __( 'Opens later today', 'open-calendar-kit' );
+	}
+
+	/**
+	 * Return the default text for "closes early" time events.
+	 *
+	 * @return string
+	 */
+	public static function get_default_calendar_event_text_closes_early() {
+		return __( 'Open only until today', 'open-calendar-kit' );
+	}
+
+	/**
+	 * Return the default text for "open only" time events.
+	 *
+	 * @return string
+	 */
+	public static function get_default_calendar_event_text_open_only() {
+		return __( 'Open only today', 'open-calendar-kit' );
+	}
+
+	/**
+	 * Return the default calendar-event text block list.
+	 *
+	 * @return array<int, array{key:string,label:string}>
+	 */
+	public static function get_default_calendar_event_text_blocks(): array {
+		return array(
+			array(
+				'key'   => 'opens_later',
+				'label' => self::get_default_calendar_event_text_opens_later(),
+			),
+			array(
+				'key'   => 'closes_early',
+				'label' => self::get_default_calendar_event_text_closes_early(),
+			),
+			array(
+				'key'   => 'open_only',
+				'label' => self::get_default_calendar_event_text_open_only(),
+			),
+		);
+	}
+
+	/**
+	 * Normalize a configurable calendar-event text value.
+	 *
+	 * @param mixed  $value   Candidate text.
+	 * @param string $default Fallback text.
+	 * @return string
+	 */
+	public static function normalize_calendar_event_text( $value, string $default ): string {
+		$value = sanitize_text_field( (string) $value );
+
+		return '' !== $value ? $value : $default;
+	}
+
+	/**
+	 * Build a text-block list from legacy single-field settings.
+	 *
+	 * @param array<string, mixed> $settings Candidate settings.
+	 * @return array<int, array{key:string,label:string}>
+	 */
+	private static function build_legacy_calendar_event_text_blocks( array $settings ): array {
+		return array(
+			array(
+				'key'   => 'opens_later',
+				'label' => self::normalize_calendar_event_text( $settings['calendar_event_text_opens_later'] ?? '', self::get_default_calendar_event_text_opens_later() ),
+			),
+			array(
+				'key'   => 'closes_early',
+				'label' => self::normalize_calendar_event_text( $settings['calendar_event_text_closes_early'] ?? '', self::get_default_calendar_event_text_closes_early() ),
+			),
+			array(
+				'key'   => 'open_only',
+				'label' => self::normalize_calendar_event_text( $settings['calendar_event_text_open_only'] ?? '', self::get_default_calendar_event_text_open_only() ),
+			),
+		);
+	}
+
+	/**
+	 * Normalize a calendar-event text-block list.
+	 *
+	 * @param mixed                               $value         Candidate list.
+	 * @param array<int, array{key:string,label:string}> $fallback_rows Fallback rows.
+	 * @return array<int, array{key:string,label:string}>
+	 */
+	private static function normalize_calendar_event_text_blocks( $value, array $fallback_rows ): array {
+		$fallback_map = array();
+		foreach ( $fallback_rows as $fallback_row ) {
+			if ( empty( $fallback_row['key'] ) ) {
+				continue;
+			}
+
+			$fallback_map[ (string) $fallback_row['key'] ] = (string) ( $fallback_row['label'] ?? '' );
+		}
+
+		$normalized = array();
+		$used_keys  = array();
+
+		if ( is_array( $value ) ) {
+			foreach ( $value as $index => $row ) {
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+
+				$key = sanitize_key( $row['key'] ?? '' );
+				if ( '' === $key ) {
+					$key = 'text_block_' . (string) $index;
+				}
+
+				while ( isset( $used_keys[ $key ] ) ) {
+					$key .= '_copy';
+				}
+
+				$label = sanitize_text_field( (string) ( $row['label'] ?? '' ) );
+				if ( '' === $label ) {
+					continue;
+				}
+
+				$normalized[] = array(
+					'key'   => $key,
+					'label' => $label,
+				);
+				$used_keys[ $key ] = true;
+			}
+		}
+
+		if ( is_array( $value ) ) {
+			return $normalized;
+		}
+
+		$default_rows = array();
+		foreach ( $fallback_rows as $index => $fallback_row ) {
+			$key   = sanitize_key( $fallback_row['key'] ?? '' );
+			$label = sanitize_text_field( (string) ( $fallback_row['label'] ?? '' ) );
+
+			if ( '' === $key ) {
+				$key = 'text_block_' . (string) $index;
+			}
+
+			if ( '' === $label || isset( $used_keys[ $key ] ) ) {
+				continue;
+			}
+
+			$default_rows[] = array(
+				'key'   => $key,
+				'label' => $label,
+			);
+			$used_keys[ $key ] = true;
+		}
+
+		return $default_rows;
+	}
+
+	/**
+	 * Return the configured calendar-event text blocks.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function get_calendar_event_text_blocks(): array {
+		$settings = self::get_settings();
+		$blocks   = $settings['calendar_event_text_blocks'] ?? self::get_default_calendar_event_text_blocks();
+		$map      = array();
+
+		if ( is_array( $blocks ) ) {
+			foreach ( $blocks as $block ) {
+				if ( ! is_array( $block ) || empty( $block['key'] ) ) {
+					continue;
+				}
+
+				$map[ (string) $block['key'] ] = (string) ( $block['label'] ?? '' );
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * Render one editable calendar-event text-block row.
+	 *
+	 * @param int|string $index Row index.
+	 * @param string $key   Stable row key.
+	 * @param string $label Editable row label.
+	 * @return string
+	 */
+	private static function render_calendar_event_text_block_row( $index, string $key, string $label ): string {
+		ob_start();
+		?>
+		<div class="openkit-text-block-row" data-openkit-text-block-row="1">
+			<input
+				type="hidden"
+				name="openkit_settings[calendar_event_text_blocks][<?php echo esc_attr( (string) $index ); ?>][key]"
+				value="<?php echo esc_attr( $key ); ?>"
+				data-openkit-text-block-key="1"
+			/>
+			<input
+				type="text"
+				name="openkit_settings[calendar_event_text_blocks][<?php echo esc_attr( (string) $index ); ?>][label]"
+				value="<?php echo esc_attr( $label ); ?>"
+				class="regular-text"
+				data-openkit-text-block-label="1"
+			/>
+			<button
+				type="button"
+				class="button-link-delete"
+				data-openkit-remove-text-block="1"
+				aria-label="<?php esc_attr_e( 'Delete text block', 'open-calendar-kit' ); ?>"
+			>
+				<?php esc_html_e( 'Delete', 'open-calendar-kit' ); ?>
+			</button>
+		</div>
+		<?php
+
+		return (string) ob_get_clean();
 	}
 
 	/**
@@ -352,6 +585,31 @@ class OpenCalendarKit_Admin_Settings {
 									/>
 									<p class="description">
 										<?php esc_html_e( 'This text is used for the [openkit_admin_link] button on the frontend. Default: Admin-Login.', 'open-calendar-kit' ); ?>
+									</p>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php esc_html_e( 'Calendar event text blocks', 'open-calendar-kit' ); ?></th>
+								<td>
+									<div class="openkit-text-blocks" data-openkit-text-blocks="1">
+										<div class="openkit-text-blocks__rows" data-openkit-text-block-rows="1">
+											<?php foreach ( $settings['calendar_event_text_blocks'] as $index => $text_block ) : ?>
+												<?php echo self::render_calendar_event_text_block_row( (int) $index, (string) $text_block['key'], (string) $text_block['label'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+											<?php endforeach; ?>
+										</div>
+										<p>
+											<button type="button" class="button" data-openkit-add-text-block="1">
+												<?php esc_html_e( 'Add text block', 'open-calendar-kit' ); ?>
+											</button>
+										</p>
+										<script type="text/template" data-openkit-text-block-template="1">
+											<?php
+											echo self::render_calendar_event_text_block_row( '__INDEX__', '__KEY__', '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+											?>
+										</script>
+									</div>
+									<p class="description">
+										<?php esc_html_e( 'These texts are available as selectable building blocks for calendar events. You can add, change, or delete entries without overwriting existing saved settings.', 'open-calendar-kit' ); ?>
 									</p>
 								</td>
 							</tr>

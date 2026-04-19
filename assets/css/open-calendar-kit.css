@@ -16,6 +16,12 @@
   --okit-color-event-border: #b7d3f7;
   --okit-color-event-text: #111111;
   --okit-color-event-strong-text: #ffffff;
+  --okit-color-event-orange-soft: #fff0e2;
+  --okit-color-event-orange-border: #f2c18f;
+  --okit-color-event-orange-text: #111111;
+  --okit-color-event-yellow-soft: #fff7cc;
+  --okit-color-event-yellow-border: #e7d36a;
+  --okit-color-event-yellow-text: #111111;
 
   /* Future theme hooks for calendar states and event callouts. */
   --okit-day-open-bg: var(--okit-color-success-soft);
@@ -408,6 +414,18 @@
   outline: 1px solid var(--okit-day-event-border);
 }
 
+.bkit-cell.day.has-event.event-color-orange,
+.bkit-calendar .bkit-cal-table button.bkit-cell.day.has-event.event-color-orange {
+  background: var(--okit-color-event-orange-soft);
+  outline: 1px solid var(--okit-color-event-orange-border);
+}
+
+.bkit-cell.day.has-event.event-color-yellow,
+.bkit-calendar .bkit-cal-table button.bkit-cell.day.has-event.event-color-yellow {
+  background: var(--okit-color-event-yellow-soft);
+  outline: 1px solid var(--okit-color-event-yellow-border);
+}
+
 .bkit-cell.day.has-event .num,
 .bkit-calendar .bkit-cal-table button.bkit-cell.day.has-event .num {
   color: var(--okit-day-event-text);
@@ -464,6 +482,18 @@
   border: 1px solid var(--okit-event-callout-border);
 }
 
+.bkit-calendar-event-callout--orange .bkit-ui-callout {
+  background: var(--okit-color-event-orange-soft);
+  border-color: var(--okit-color-event-orange-border);
+  color: var(--okit-color-event-orange-text);
+}
+
+.bkit-calendar-event-callout--yellow .bkit-ui-callout {
+  background: var(--okit-color-event-yellow-soft);
+  border-color: var(--okit-color-event-yellow-border);
+  color: var(--okit-color-event-yellow-text);
+}
+
 .bkit-calendar-event__inner {
   display: flex;
   align-items: center;
@@ -493,6 +523,16 @@
   font-weight: 500;
   line-height: 1.35;
   text-align: center;
+}
+
+.bkit-calendar-event-callout--orange .bkit-calendar-event__text,
+.bkit-calendar-event-callout--orange .bkit-calendar-event__meta {
+  color: var(--okit-color-event-orange-text);
+}
+
+.bkit-calendar-event-callout--yellow .bkit-calendar-event__text,
+.bkit-calendar-event-callout--yellow .bkit-calendar-event__meta {
+  color: var(--okit-color-event-yellow-text);
 }
 
 .bkit-event-title,
@@ -551,7 +591,7 @@
 .openkit-calendar-events__header,
 .openkit-calendar-events__row {
   display: grid;
-  grid-template-columns: 150px minmax(240px, 2.2fr) 96px 110px 110px 150px 40px;
+  grid-template-columns: 150px minmax(340px, 2.7fr) 110px 110px 110px 40px;
   gap: 12px;
   align-items: center;
 }
@@ -577,17 +617,21 @@
   min-width: 0;
 }
 
-.openkit-calendar-events__type,
+.openkit-calendar-events__text-cell {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.95fr) minmax(0, 1.6fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.openkit-calendar-events__preset,
+.openkit-calendar-events__color {
+  width: 100%;
+}
+
 .openkit-calendar-events__time {
   width: 100%;
-}
-
-.openkit-calendar-events__visibility {
-  width: 100%;
-}
-
-.openkit-calendar-events__row:not(.is-time-event) .openkit-calendar-events__time {
-  opacity: .55;
 }
 
 .openkit-calendar-events__remove {
@@ -608,6 +652,10 @@
   }
 
   .openkit-calendar-events__row {
+    grid-template-columns: 1fr;
+  }
+
+  .openkit-calendar-events__text-cell {
     grid-template-columns: 1fr;
   }
 
@@ -745,6 +793,94 @@
 
 .bkit-modal-box--closed {
   padding-top: 20px;
+}
+
+.bkit-modal-box--event-orange {
+  border-top: 4px solid var(--okit-color-event-orange-border);
+}
+
+.bkit-modal-box--event-yellow {
+  border-top: 4px solid var(--okit-color-event-yellow-border);
+}
+
+.openkit-bulk-closed-days {
+  margin: 1rem 0 1.25rem;
+  max-width: 980px;
+}
+
+.openkit-bulk-closed-days__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.openkit-bulk-closed-days__panel {
+  display: none;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.openkit-bulk-closed-days.is-open .openkit-bulk-closed-days__panel {
+  display: block;
+}
+
+.openkit-bulk-closed-days__fields {
+  display: grid;
+  grid-template-columns: 150px 150px minmax(220px, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.openkit-bulk-closed-days__field {
+  display: grid;
+  gap: 6px;
+}
+
+.openkit-bulk-closed-days__field label {
+  font-weight: 600;
+}
+
+.openkit-bulk-closed-days__field input {
+  width: 100%;
+}
+
+.openkit-bulk-closed-days__actions {
+  margin-top: 12px;
+}
+
+.openkit-text-blocks {
+  max-width: 760px;
+}
+
+.openkit-text-blocks__rows {
+  display: grid;
+  gap: 8px;
+}
+
+.openkit-text-block-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.openkit-text-block-row input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .openkit-bulk-closed-days__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .openkit-text-block-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 .bkit-close {

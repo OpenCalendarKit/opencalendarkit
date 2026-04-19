@@ -143,7 +143,7 @@ class OpenCalendarKit_Shortcode_StatusToday {
 				$label = __( 'Today closed', 'open-calendar-kit' );
 				$class = 'closed';
 
-				if ( ! $closed_event && is_array( $calendar_event ) && 'time' === $calendar_event['type'] ) {
+				if ( ! $closed_event && is_array( $calendar_event ) && OpenCalendarKit_Admin_CalendarEvents::has_special_times( $calendar_event ) ) {
 					[ $start, $end ] = static::get_time_range_for_values(
 						(string) $calendar_event['open_time'],
 						(string) $calendar_event['close_time'],
@@ -151,24 +151,20 @@ class OpenCalendarKit_Shortcode_StatusToday {
 						$now
 					);
 
-					if ( ! $start ) {
-						$label = __( 'Today closed', 'open-calendar-kit' );
-						$class = 'closed';
-					} elseif ( $now < $start ) {
+					if ( $start && $now < $start ) {
 						/* translators: %s: opening time for today. */
 						$label = sprintf( __( 'Opens today at %s', 'open-calendar-kit' ), $start->format( $time_format ) );
 						$class = 'upcoming';
-					} elseif ( ! $end || $now <= $end ) {
-						if ( $end ) {
-							/* translators: %s: closing time for today. */
-							$label = sprintf( __( 'Open now until %s', 'open-calendar-kit' ), $end->format( $time_format ) );
-						} else {
-							$label = __( 'Open now', 'open-calendar-kit' );
-						}
-						$class = 'open';
-					} else {
+					} elseif ( $end && $now > $end ) {
 						$label = __( 'Closed now', 'open-calendar-kit' );
 						$class = 'ended';
+					} elseif ( $end ) {
+						/* translators: %s: closing time for today. */
+						$label = sprintf( __( 'Open now until %s', 'open-calendar-kit' ), $end->format( $time_format ) );
+						$class = 'open';
+					} else {
+						$label = __( 'Open now', 'open-calendar-kit' );
+						$class = 'open';
 					}
 				} elseif ( ! $closed_event && ! $is_rule_closed ) {
 					[ $start, $end ] = static::get_time_range_for_row( $row, $timezone, $now );
