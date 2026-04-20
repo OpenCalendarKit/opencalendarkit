@@ -44,48 +44,58 @@ class OpenCalendarKit_Admin_OpeningHours {
 	}
 
 	/**
-	 * Return default weekly opening hours.
+	 * Return an empty weekly opening-hours structure.
 	 *
 	 * @return array<int, array<string, int|string>>
 	 */
 	public static function default_hours() {
 		return array(
 			1 => array(
-				'closed' => 1,
+				'closed' => 0,
 				'from'   => '',
 				'to'     => '',
 			),
 			2 => array(
 				'closed' => 0,
-				'from'   => '16:30',
-				'to'     => '22:00',
+				'from'   => '',
+				'to'     => '',
 			),
 			3 => array(
 				'closed' => 0,
-				'from'   => '16:30',
-				'to'     => '22:00',
+				'from'   => '',
+				'to'     => '',
 			),
 			4 => array(
 				'closed' => 0,
-				'from'   => '16:30',
-				'to'     => '22:00',
+				'from'   => '',
+				'to'     => '',
 			),
 			5 => array(
 				'closed' => 0,
-				'from'   => '16:30',
-				'to'     => '22:00',
+				'from'   => '',
+				'to'     => '',
 			),
 			6 => array(
 				'closed' => 0,
-				'from'   => '12:00',
+				'from'   => '',
 				'to'     => '',
 			),
 			7 => array(
 				'closed' => 0,
-				'from'   => '12:00',
-				'to'     => '21:00',
+				'from'   => '',
+				'to'     => '',
 			),
 		);
+	}
+
+	/**
+	 * Determine whether a row has at least one configured time value.
+	 *
+	 * @param array<string, mixed> $row Opening-hours row.
+	 * @return bool
+	 */
+	public static function has_configured_hours( array $row ): bool {
+		return '' !== trim( (string) ( $row['from'] ?? '' ) ) || '' !== trim( (string) ( $row['to'] ?? '' ) );
 	}
 
 	/**
@@ -227,14 +237,35 @@ class OpenCalendarKit_Admin_OpeningHours {
 		}
 
 		if ( isset( $hours[1], $hours[7] ) && ! isset( $hours[0] ) ) {
-			return $hours;
+			$normalized = self::default_hours();
+			for ( $index = 1; $index <= 7; $index++ ) {
+				if ( isset( $hours[ $index ] ) && is_array( $hours[ $index ] ) ) {
+					$normalized[ $index ] = wp_parse_args(
+						$hours[ $index ],
+						array(
+							'closed' => 0,
+							'from'   => '',
+							'to'     => '',
+						)
+					);
+				}
+			}
+
+			return $normalized;
 		}
 
 		if ( isset( $hours[0], $hours[6] ) ) {
-			$normalized = array();
+			$normalized = self::default_hours();
 			for ( $index = 0; $index <= 6; $index++ ) {
 				$target                = 0 === $index ? 7 : $index;
-				$normalized[ $target ] = is_array( $hours[ $index ] ) ? $hours[ $index ] : array(
+				$normalized[ $target ] = is_array( $hours[ $index ] ) ? wp_parse_args(
+					$hours[ $index ],
+					array(
+						'closed' => 0,
+						'from'   => '',
+						'to'     => '',
+					)
+				) : array(
 					'closed' => 0,
 					'from'   => '',
 					'to'     => '',

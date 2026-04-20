@@ -160,7 +160,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 					}
 
 					$config          = $get_hours_row( $day_n );
-					$closed_by_rule  = ! empty( $config['closed'] );
+					$closed_by_rule  = ! empty( $config['closed'] ) || ! OpenCalendarKit_Admin_OpeningHours::has_configured_hours( $config );
 					$closed_by_event = OpenCalendarKit_Admin_ClosedDays::is_closed_on( $cell_date );
 					$open_override   = OpenCalendarKit_Admin_ClosedDays::is_open_exception_on( $cell_date );
 					$event           = OpenCalendarKit_Admin_CalendarEvents::get_event_display_data( $cell_date, $time_format );

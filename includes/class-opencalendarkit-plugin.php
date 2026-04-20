@@ -18,7 +18,7 @@ if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.1.5' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.6' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
@@ -90,7 +90,7 @@ class OpenCalendarKit_Plugin {
 	const NONCE_EVENT_NOTICE    = 'openkit_save_event_notice';
 	const NONCE_CLOSED_DAY_META = 'openkit_closed_day_meta';
 
-	const DATA_VERSION = '1.1.5';
+	const DATA_VERSION = '1.1.6';
 
 	/**
 	 * Register runtime hooks.
@@ -308,7 +308,7 @@ class OpenCalendarKit_Plugin {
 		self::ensure_roles_caps();
 
 		if ( false === get_option( self::OPTION_OPENING_HOURS, false ) ) {
-			add_option( self::OPTION_OPENING_HOURS, OpenCalendarKit_Admin_OpeningHours::default_hours() );
+			add_option( self::OPTION_OPENING_HOURS, array() );
 		}
 
 		if ( false === get_option( self::OPTION_OPENING_HOURS_NOTE, false ) ) {

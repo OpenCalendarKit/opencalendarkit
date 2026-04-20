@@ -63,11 +63,25 @@ class OpenCalendarKit_Shortcode_OpeningHours {
 			return __( 'Closed', 'open-calendar-kit' );
 		}
 
-		$from = OpenCalendarKit_Admin_Settings::format_time_value( $row['from'] ?? '', $time_format_mode );
-		$to   = trim( (string) ( $row['to'] ?? '' ) );
-		$to   = self::is_open_end( $to )
+		$from_raw = trim( (string) ( $row['from'] ?? '' ) );
+		$to_raw   = trim( (string) ( $row['to'] ?? '' ) );
+
+		if ( '' === $from_raw && '' === $to_raw ) {
+			return __( 'Closed', 'open-calendar-kit' );
+		}
+
+		$from = OpenCalendarKit_Admin_Settings::format_time_value( $from_raw, $time_format_mode );
+		$to   = self::is_open_end( $to_raw )
 			? self::get_open_end_label()
-			: OpenCalendarKit_Admin_Settings::format_time_value( $to, $time_format_mode );
+			: OpenCalendarKit_Admin_Settings::format_time_value( $to_raw, $time_format_mode );
+
+		if ( '' === $from ) {
+			return $to;
+		}
+
+		if ( '' === $to ) {
+			return $from;
+		}
 
 		return $from . ' – ' . $to;
 	}

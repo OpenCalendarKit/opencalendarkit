@@ -96,6 +96,12 @@ The frontend stylesheet uses CSS custom properties for calendar states, notices,
 
 ## Changelog
 
+## 1.1.6
+
+- stopped pre-filling opening hours on new installs
+- kept opening hours empty until users save their own values
+- shortened the WordPress.org readme for a clearer plugin-directory presentation
+
 ## 1.1.5
 
 - simplified the calendar-events admin table by removing the event-type and shortcode-output columns

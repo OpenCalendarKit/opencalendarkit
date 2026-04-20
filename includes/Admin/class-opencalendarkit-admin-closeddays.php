@@ -606,7 +606,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 			}
 
 			$config          = $get_hours_row( $day_n );
-			$closed_by_rule  = ! empty( $config['closed'] );
+			$closed_by_rule  = ! empty( $config['closed'] ) || ! OpenCalendarKit_Admin_OpeningHours::has_configured_hours( $config );
 			$closed_by_event = self::is_closed_on( $cell_date );
 			$open_override   = self::is_open_exception_on( $cell_date );
 			$event           = OpenCalendarKit_Admin_CalendarEvents::get_event_display_data( $cell_date, OpenCalendarKit_Admin_Settings::get_time_format() );
