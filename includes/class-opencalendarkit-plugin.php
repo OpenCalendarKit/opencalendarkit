@@ -10,15 +10,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_PATH' ) ) {
-	define( 'OPENKIT_PLUGIN_PATH', plugin_dir_path( dirname( __FILE__ ) ) );
+	define( 'OPENKIT_PLUGIN_PATH', plugin_dir_path( __DIR__ ) );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
-	define( 'OPENKIT_PLUGIN_URL', plugin_dir_url( dirname( __FILE__ ) ) );
+	define( 'OPENKIT_PLUGIN_URL', plugin_dir_url( __DIR__ ) );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.1.6' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.7' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
@@ -58,6 +58,7 @@ class OpenCalendarKit_Plugin {
 	const OPTION_CALENDAR_EVENTS      = 'openkit_calendar_events';
 	const OPTION_EVENT_NOTICE_ENABLED = 'openkit_event_notice_enabled';
 	const OPTION_EVENT_NOTICE_CONTENT = 'openkit_event_notice_content';
+	const OPTION_EVENT_NOTICE_THEME   = 'openkit_event_notice_theme';
 	const OPTION_DATA_VERSION         = 'openkit_data_version';
 
 	const LEGACY_OPTION_SETTINGS             = 'okit_settings';
@@ -69,12 +70,12 @@ class OpenCalendarKit_Plugin {
 	const CPT_CLOSED_DAY        = 'openkit_closed_day';
 	const LEGACY_CPT_CLOSED_DAY = 'bk_closed_day';
 
-	const SHORTCODE_CALENDAR      = 'openkit_calendar';
+	const SHORTCODE_CALENDAR       = 'openkit_calendar';
 	const SHORTCODE_CALENDAR_EVENT = 'openkit_calendar_event';
-	const SHORTCODE_OPENING_HOURS = 'openkit_opening_hours';
-	const SHORTCODE_STATUS_TODAY  = 'openkit_status_today';
-	const SHORTCODE_EVENT_NOTICE  = 'openkit_event_notice';
-	const SHORTCODE_ADMIN_LINK    = 'openkit_admin_link';
+	const SHORTCODE_OPENING_HOURS  = 'openkit_opening_hours';
+	const SHORTCODE_STATUS_TODAY   = 'openkit_status_today';
+	const SHORTCODE_EVENT_NOTICE   = 'openkit_event_notice';
+	const SHORTCODE_ADMIN_LINK     = 'openkit_admin_link';
 
 	const AJAX_CALENDAR_MONTH        = 'openkit_calendar_month';
 	const AJAX_ADMIN_CALENDAR_MONTH  = 'openkit_admin_calendar_month';
@@ -90,7 +91,7 @@ class OpenCalendarKit_Plugin {
 	const NONCE_EVENT_NOTICE    = 'openkit_save_event_notice';
 	const NONCE_CLOSED_DAY_META = 'openkit_closed_day_meta';
 
-	const DATA_VERSION = '1.1.6';
+	const DATA_VERSION = '1.1.7';
 
 	/**
 	 * Register runtime hooks.
@@ -213,7 +214,7 @@ class OpenCalendarKit_Plugin {
 			return;
 		}
 
-		$translations = json_decode( (string) file_get_contents( $json_file ), true );
+		$translations = json_decode( (string) file_get_contents( $json_file ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Reads a local bundled translation file, not a remote URL.
 		if (
 			! is_array( $translations ) ||
 			! isset( $translations['locale_data']['messages'] ) ||
@@ -325,6 +326,10 @@ class OpenCalendarKit_Plugin {
 
 		if ( false === get_option( self::OPTION_EVENT_NOTICE_CONTENT, false ) ) {
 			add_option( self::OPTION_EVENT_NOTICE_CONTENT, '' );
+		}
+
+		if ( false === get_option( self::OPTION_EVENT_NOTICE_THEME, false ) ) {
+			add_option( self::OPTION_EVENT_NOTICE_THEME, 'blue' );
 		}
 
 		if ( false === get_option( self::SETTINGS_OPTION, false ) ) {

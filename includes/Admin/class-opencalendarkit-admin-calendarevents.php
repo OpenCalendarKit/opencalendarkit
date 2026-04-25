@@ -13,13 +13,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Manages simple day-based calendar events.
  */
 class OpenCalendarKit_Admin_CalendarEvents {
-	private const NONCE_ACTION = 'openkit_save_calendar_events';
-	private const FORM_STATE_OPTION = 'openkit_calendar_events_form_state';
-	private const TYPE_TEXT    = 'text';
-	private const TYPE_TIME    = 'time';
-	private const COLOR_BLUE   = 'blue';
-	private const COLOR_ORANGE = 'orange';
-	private const COLOR_YELLOW = 'yellow';
+	private const NONCE_ACTION        = 'openkit_save_calendar_events';
+	private const FORM_STATE_OPTION   = 'openkit_calendar_events_form_state';
+	private const TYPE_TEXT           = 'text';
+	private const TYPE_TIME           = 'time';
+	private const COLOR_BLUE          = 'blue';
+	private const COLOR_SKY           = 'sky';
+	private const COLOR_INDIGO        = 'indigo';
+	private const COLOR_VIOLET        = 'violet';
+	private const COLOR_PINK          = 'pink';
+	private const COLOR_AMBER         = 'amber';
+	private const COLOR_YELLOW        = 'yellow';
+	private const COLOR_ORANGE        = 'orange';
 	private const PRESET_NONE         = '';
 	private const PRESET_OPENS_LATER  = 'opens_later';
 	private const PRESET_CLOSES_EARLY = 'closes_early';
@@ -52,9 +57,10 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			return;
 		}
 
-		$events = isset( $_POST['openkit_calendar_events'] ) ? wp_unslash( $_POST['openkit_calendar_events'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized and validated in build_submission_result().
-		$events = is_array( $events ) ? $events : array();
-		$result = self::build_submission_result( $events );
+		$events           = isset( $_POST['openkit_calendar_events'] ) ? wp_unslash( $_POST['openkit_calendar_events'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized and validated in build_submission_result().
+		$events           = is_array( $events ) ? $events : array();
+		$result           = self::build_submission_result( $events );
+		$show_past_events = isset( $_POST['openkit_show_past_events'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['openkit_show_past_events'] ) );
 
 		if ( ! empty( $result['errors'] ) ) {
 			self::store_form_state( $result['rows'], $result['errors'] );
@@ -62,8 +68,9 @@ class OpenCalendarKit_Admin_CalendarEvents {
 			wp_safe_redirect(
 				add_query_arg(
 					array(
-						'page'                 => OpenCalendarKit_Plugin::PAGE_CALENDAR,
-						'openkit_events_error' => '1',
+						'page'                     => OpenCalendarKit_Plugin::PAGE_CALENDAR,
+						'openkit_events_error'     => '1',
+						'openkit_show_past_events' => $show_past_events ? '1' : false,
 					),
 					admin_url( 'admin.php' )
 				)
@@ -77,8 +84,9 @@ class OpenCalendarKit_Admin_CalendarEvents {
 		wp_safe_redirect(
 			add_query_arg(
 				array(
-					'page'                   => OpenCalendarKit_Plugin::PAGE_CALENDAR,
-					'openkit_events_updated' => '1',
+					'page'                     => OpenCalendarKit_Plugin::PAGE_CALENDAR,
+					'openkit_events_updated'   => '1',
+					'openkit_show_past_events' => $show_past_events ? '1' : false,
 				),
 				admin_url( 'admin.php' )
 			)
@@ -152,16 +160,16 @@ class OpenCalendarKit_Admin_CalendarEvents {
 		$summary    = self::get_event_summary( $event, $time_format );
 
 		return array(
-				'date'              => $event['date'],
-				'type'              => $event['type'],
-				'title'             => $title,
-				'text'              => $event['text'],
-				'text_preset'       => $event['text_preset'],
-				'time_label'        => $time_label,
-				'summary'           => $summary,
-				'color'             => $event['color'],
-				'show_in_shortcode' => 1,
-			);
+			'date'              => $event['date'],
+			'type'              => $event['type'],
+			'title'             => $title,
+			'text'              => $event['text'],
+			'text_preset'       => $event['text_preset'],
+			'time_label'        => $time_label,
+			'summary'           => $summary,
+			'color'             => $event['color'],
+			'show_in_shortcode' => 1,
+		);
 	}
 
 	/**
@@ -170,27 +178,38 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	public static function render_admin_section(): string {
-		$form_state     = self::consume_form_state();
-		$events         = ! empty( $form_state['rows'] ) ? $form_state['rows'] : self::get_events();
-		$form_errors    = ! empty( $form_state['errors'] ) ? $form_state['errors'] : array();
-		$events_updated = filter_input( INPUT_GET, 'openkit_events_updated', FILTER_SANITIZE_SPECIAL_CHARS );
-		if ( empty( $events ) ) {
-			$events[] = array(
-				'date'              => '',
-				'type'              => self::TYPE_TEXT,
-				'text'              => '',
-				'text_preset'       => self::PRESET_NONE,
-				'open_time'         => '',
-				'close_time'        => '',
-				'color'             => self::COLOR_BLUE,
-				'show_in_shortcode' => 1,
-			);
+		$form_state       = self::consume_form_state();
+		$form_errors      = ! empty( $form_state['errors'] ) ? $form_state['errors'] : array();
+		$events_updated   = isset( $_GET['openkit_events_updated'] ) ? sanitize_text_field( wp_unslash( $_GET['openkit_events_updated'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin notice flag.
+		$show_past_events = isset( $_GET['openkit_show_past_events'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['openkit_show_past_events'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only table filter.
+		$today            = self::get_today_date();
+		$hidden_events    = array();
+
+		if ( ! empty( $form_state['rows'] ) ) {
+			$visible_events = $form_state['rows'];
+		} else {
+			$all_events     = self::get_events();
+			$visible_events = array();
+
+			foreach ( $all_events as $event ) {
+				if ( ! $show_past_events && $event['date'] < $today ) {
+					$hidden_events[] = $event;
+					continue;
+				}
+
+				$visible_events[] = $event;
+			}
 		}
+
+		$events = array_merge(
+			array( self::get_empty_row() ),
+			self::sort_events_descending( $visible_events )
+		);
 
 		ob_start();
 		?>
 		<div class="openkit-calendar-events">
-			<?php if ( is_string( $events_updated ) && '' !== $events_updated ) : ?>
+			<?php if ( '' !== $events_updated ) : ?>
 				<div class="updated"><p><?php esc_html_e( 'Calendar events saved.', 'open-calendar-kit' ); ?></p></div>
 			<?php endif; ?>
 			<?php if ( ! empty( $form_errors ) ) : ?>
@@ -203,8 +222,23 @@ class OpenCalendarKit_Admin_CalendarEvents {
 
 			<h2><?php esc_html_e( 'Calendar Events', 'open-calendar-kit' ); ?></h2>
 
+			<form method="get" class="openkit-calendar-events__filters">
+				<input type="hidden" name="page" value="<?php echo esc_attr( OpenCalendarKit_Plugin::PAGE_CALENDAR ); ?>" />
+				<label>
+					<input
+						type="checkbox"
+						name="openkit_show_past_events"
+						value="1"
+						<?php checked( $show_past_events ); ?>
+					/>
+					<?php esc_html_e( 'Show past events as well', 'open-calendar-kit' ); ?>
+				</label>
+				<button type="submit" class="button"><?php esc_html_e( 'Apply', 'open-calendar-kit' ); ?></button>
+			</form>
+
 			<form method="post" class="openkit-calendar-events__form">
 				<?php wp_nonce_field( self::NONCE_ACTION, 'openkit_calendar_events_nonce' ); ?>
+				<input type="hidden" name="openkit_show_past_events" value="<?php echo esc_attr( $show_past_events ? '1' : '0' ); ?>" />
 
 				<div class="openkit-calendar-events__header">
 					<span><?php esc_html_e( 'Date', 'open-calendar-kit' ); ?></span>
@@ -218,6 +252,9 @@ class OpenCalendarKit_Admin_CalendarEvents {
 				<div class="openkit-calendar-events__rows" data-openkit-calendar-event-rows="1">
 					<?php foreach ( $events as $index => $event ) : ?>
 						<?php echo self::render_event_row( (int) $index, $event['date'], $event['text'], $event['text_preset'] ?? self::PRESET_NONE, $event['open_time'], $event['close_time'], $event['color'] ?? self::COLOR_BLUE ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php endforeach; ?>
+					<?php foreach ( $hidden_events as $hidden_index => $hidden_event ) : ?>
+						<?php echo self::render_hidden_event_row( 'past_' . (string) $hidden_index, $hidden_event ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<?php endforeach; ?>
 				</div>
 
@@ -307,7 +344,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 					return strcmp( $left['type'], $right['type'] );
 				}
 
-				return strcmp( $left['date'], $right['date'] );
+				return strcmp( $right['date'], $left['date'] );
 			}
 		);
 
@@ -324,8 +361,10 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @param int|string $index      Row index.
 	 * @param string     $date       Event date.
 	 * @param string     $text       Event text.
+	 * @param string     $text_preset Text preset key.
 	 * @param string     $open_time  Opening time override.
 	 * @param string     $close_time Closing time override.
+	 * @param string     $color      Event color key.
 	 * @return string
 	 */
 	private static function render_event_row( $index, string $date, string $text, string $text_preset, string $open_time, string $close_time, string $color ): string {
@@ -391,19 +430,87 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	}
 
 	/**
+	 * Render a hidden event row so filtered past events are preserved on save.
+	 *
+	 * @param int|string           $index Row index.
+	 * @param array<string, mixed> $event Event row.
+	 * @return string
+	 */
+	private static function render_hidden_event_row( $index, array $event ): string {
+		$row = self::prepare_event_row( $event );
+		ob_start();
+		?>
+		<div class="openkit-calendar-events__hidden-row" style="display:none;">
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][date]" value="<?php echo esc_attr( $row['date'] ); ?>" />
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][type]" value="<?php echo esc_attr( $row['type'] ); ?>" />
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][text]" value="<?php echo esc_attr( $row['text'] ); ?>" />
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][text_preset]" value="<?php echo esc_attr( $row['text_preset'] ); ?>" />
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][open_time]" value="<?php echo esc_attr( $row['open_time'] ); ?>" />
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][close_time]" value="<?php echo esc_attr( $row['close_time'] ); ?>" />
+			<input type="hidden" name="openkit_calendar_events[<?php echo esc_attr( (string) $index ); ?>][color]" value="<?php echo esc_attr( $row['color'] ); ?>" />
+		</div>
+		<?php
+
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Return the blank row used as the first editable input.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private static function get_empty_row(): array {
+		return array(
+			'date'              => '',
+			'type'              => self::TYPE_TEXT,
+			'text'              => '',
+			'text_preset'       => self::PRESET_NONE,
+			'open_time'         => '',
+			'close_time'        => '',
+			'color'             => self::COLOR_BLUE,
+			'show_in_shortcode' => 1,
+		);
+	}
+
+	/**
+	 * Sort event rows descending by date while keeping blank rows first.
+	 *
+	 * @param array<int, array<string, mixed>> $events Event rows.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function sort_events_descending( array $events ): array {
+		usort(
+			$events,
+			static function ( array $left, array $right ): int {
+				if ( '' === (string) ( $left['date'] ?? '' ) ) {
+					return -1;
+				}
+
+				if ( '' === (string) ( $right['date'] ?? '' ) ) {
+					return 1;
+				}
+
+				return strcmp( (string) $right['date'], (string) $left['date'] );
+			}
+		);
+
+		return array_values( $events );
+	}
+
+	/**
 	 * Normalize a raw event row.
 	 *
 	 * @param array<string, mixed> $event Raw event row.
 	 * @return array{date:string,type:string,text:string,open_time:string,close_time:string,show_in_shortcode:int}|null
 	 */
 	private static function prepare_event_row( array $event ): array {
-		$date       = isset( $event['date'] ) ? sanitize_text_field( (string) $event['date'] ) : '';
-		$text       = isset( $event['text'] ) ? sanitize_text_field( (string) $event['text'] ) : '';
+		$date        = isset( $event['date'] ) ? sanitize_text_field( (string) $event['date'] ) : '';
+		$text        = isset( $event['text'] ) ? sanitize_text_field( (string) $event['text'] ) : '';
 		$text_preset = self::normalize_text_preset( $event['text_preset'] ?? self::PRESET_NONE );
-		$open_time  = self::normalize_time_value( $event['open_time'] ?? '' );
-		$close_time = self::normalize_time_value( $event['close_time'] ?? '' );
-		$type       = self::normalize_type( $event['type'] ?? self::TYPE_TEXT, $open_time, $close_time );
-		$color      = self::normalize_color( $event['color'] ?? self::COLOR_BLUE );
+		$open_time   = self::normalize_time_value( $event['open_time'] ?? '' );
+		$close_time  = self::normalize_time_value( $event['close_time'] ?? '' );
+		$type        = self::normalize_type( $event['type'] ?? self::TYPE_TEXT, $open_time, $close_time );
+		$color       = self::normalize_color( $event['color'] ?? self::COLOR_BLUE );
 
 		return array(
 			'date'              => $date,
@@ -456,7 +563,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * @return string
 	 */
 	private static function normalize_text_preset( $value ): string {
-		$value = sanitize_key( (string) $value );
+		$value       = sanitize_key( (string) $value );
 		$text_blocks = OpenCalendarKit_Admin_Settings::get_calendar_event_text_blocks();
 
 		if ( '' !== $value && isset( $text_blocks[ $value ] ) ) {
@@ -475,7 +582,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	private static function normalize_color( $value ): string {
 		$value = sanitize_key( (string) $value );
 
-		if ( in_array( $value, array( self::COLOR_BLUE, self::COLOR_ORANGE, self::COLOR_YELLOW ), true ) ) {
+		if ( isset( self::get_color_options()[ $value ] ) ) {
 			return $value;
 		}
 
@@ -485,7 +592,9 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	/**
 	 * Normalize the event type value.
 	 *
-	 * @param mixed $type Raw type value.
+	 * @param mixed  $type       Raw type value.
+	 * @param string $open_time  Opening time override.
+	 * @param string $close_time Closing time override.
 	 * @return string
 	 */
 	private static function normalize_type( $type, string $open_time = '', string $close_time = '' ): string {
@@ -581,7 +690,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * Return the formatted time range for a time-event.
 	 *
 	 * @param array{date:string,type:string,text:string,open_time:string,close_time:string,show_in_shortcode:int} $event       Event row.
-	 * @param string                                                                  $time_format Time format string.
+	 * @param string                                                                                              $time_format Time format string.
 	 * @return string
 	 */
 	public static function get_time_range_label( array $event, string $time_format ): string {
@@ -608,7 +717,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * Return a summary text for an event.
 	 *
 	 * @param array{date:string,type:string,text:string,open_time:string,close_time:string,show_in_shortcode:int} $event       Event row.
-	 * @param string                                                                  $time_format Time format string.
+	 * @param string                                                                                              $time_format Time format string.
 	 * @return string
 	 */
 	public static function get_event_summary( array $event, string $time_format ): string {
@@ -650,12 +759,30 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 *
 	 * @return array<string, string>
 	 */
-	private static function get_color_options(): array {
+	public static function get_color_options(): array {
 		return array(
 			self::COLOR_BLUE   => __( 'Blue', 'open-calendar-kit' ),
-			self::COLOR_ORANGE => __( 'Orange', 'open-calendar-kit' ),
+			self::COLOR_SKY    => __( 'Sky', 'open-calendar-kit' ),
+			self::COLOR_INDIGO => __( 'Indigo', 'open-calendar-kit' ),
+			self::COLOR_VIOLET => __( 'Violet', 'open-calendar-kit' ),
+			self::COLOR_PINK   => __( 'Pink', 'open-calendar-kit' ),
+			self::COLOR_AMBER  => __( 'Amber', 'open-calendar-kit' ),
 			self::COLOR_YELLOW => __( 'Yellow', 'open-calendar-kit' ),
+			self::COLOR_ORANGE => __( 'Orange', 'open-calendar-kit' ),
 		);
+	}
+
+	/**
+	 * Return today's date in the WordPress timezone.
+	 *
+	 * @return string
+	 */
+	private static function get_today_date(): string {
+		if ( function_exists( 'wp_date' ) ) {
+			return wp_date( 'Y-m-d', null, wp_timezone() );
+		}
+
+		return date_i18n( 'Y-m-d' );
 	}
 
 	/**
@@ -716,7 +843,7 @@ class OpenCalendarKit_Admin_CalendarEvents {
 	 * Persist submitted form state for the next admin-page load.
 	 *
 	 * @param array<int, array{date:string,type:string,text:string,open_time:string,close_time:string,show_in_shortcode:int}> $rows   Submitted rows.
-	 * @param array<int, string>                                                                          $errors Error messages.
+	 * @param array<int, string>                                                                                              $errors Error messages.
 	 * @return void
 	 */
 	private static function store_form_state( array $rows, array $errors ): void {

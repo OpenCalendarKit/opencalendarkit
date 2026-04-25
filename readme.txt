@@ -4,7 +4,7 @@ Tags: opening-hours, calendar, business-hours, shortcode, events
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,9 +12,9 @@ Lightweight plugin for opening hours, today status, closed days, special opening
 
 == Description ==
 
-OpenCalendarKit helps small websites show clear public opening information without turning the site into a booking system.
+OpenCalendarKit displays opening hours, today status, closed days, special opening times, and calendar events for small business websites.
 
-Live demo and product overview: https://opencalendarkit.com/
+[Open live demo: opencalendarkit.com](https://opencalendarkit.com/)
 
 Good fit for:
 
@@ -33,8 +33,6 @@ Main features:
 * monthly frontend calendar
 * calendar events for individual days
 * simple backend screens for opening hours and calendar management
-
-OpenCalendarKit stays focused on public business information. It does not add bookings, appointments, or other large workflows.
 
 Available shortcodes:
 
@@ -55,9 +53,9 @@ Available shortcodes:
 
 == Frequently Asked Questions ==
 
-= Is this a booking or reservation plugin? =
+= What does OpenCalendarKit do? =
 
-No. OpenCalendarKit is focused on public opening and schedule information.
+It helps you publish opening hours, today status, closed days, special opening times, and calendar events on your website.
 
 = Can I add special opening times for one specific day? =
 

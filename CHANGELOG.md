@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.7
+
+- hide past calendar-event highlights in frontend and backend calendars
+- keep past calendar events hidden in the backend list unless explicitly enabled
+- keep the new empty calendar-event row at the top of the backend list
+- add more calendar-event colors while reserving red and green for open/closed states
+- rename event notices to announcements in the backend and add matching announcement themes
+
 ## 1.1.6
 
 - stopped pre-filling opening hours on new installs

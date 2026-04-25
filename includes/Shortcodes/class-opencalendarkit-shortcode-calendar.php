@@ -115,7 +115,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 				);
 				$time_format    = OpenCalendarKit_Admin_Settings::get_time_format();
 
-				$date              = self::normalize_month( $atts['month'], $timezone );
+				$date          = self::normalize_month( $atts['month'], $timezone );
 				$year          = (int) $date->format( 'Y' );
 				$month         = (int) $date->format( 'n' );
 				$days_in_month = (int) $date->format( 't' );
@@ -168,11 +168,11 @@ class OpenCalendarKit_Shortcode_Calendar {
 					$past            = $cell_date < $today;
 
 					$cells[] = array(
-						'day'        => $day,
-						'date'       => $cell_date,
-						'state'      => $state,
-						'past'       => $past,
-						'event'      => $event,
+						'day'   => $day,
+						'date'  => $cell_date,
+						'state' => $state,
+						'past'  => $past,
+						'event' => $event,
 					);
 				}
 
@@ -227,7 +227,7 @@ class OpenCalendarKit_Shortcode_Calendar {
 								}
 
 								$cell         = $cells[ $day_index++ ];
-								$has_event    = is_array( $cell['event'] ) && '' !== $cell['event']['summary'];
+								$has_event    = ! $cell['past'] && is_array( $cell['event'] ) && '' !== $cell['event']['summary'];
 								$is_clickable = $has_event || ( ! $cell['past'] && 'closed' === $cell['state'] );
 								$reason       = '';
 								if ( 'closed' === $cell['state'] ) {

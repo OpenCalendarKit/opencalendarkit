@@ -27,21 +27,21 @@ class OpenCalendarKit_Admin_ClosedDays {
 		$allowed_html['div'] = array_merge(
 			$allowed_html['div'] ?? array(),
 			array(
-				'id'                               => true,
-				'class'                            => true,
-				'style'                            => true,
-				'data-openkit-admin-calendar-root' => true,
-				'data-openkit-admin-calendar'      => true,
-				'data-month'                       => true,
-				'data-date'                        => true,
-				'data-reason'                      => true,
-				'data-closed-event'                => true,
-				'data-closed-rule'                 => true,
-				'data-open-override'               => true,
-				'data-openkit-calendar-event-rows' => true,
-				'data-openkit-calendar-event-row'  => true,
+				'id'                                   => true,
+				'class'                                => true,
+				'style'                                => true,
+				'data-openkit-admin-calendar-root'     => true,
+				'data-openkit-admin-calendar'          => true,
+				'data-month'                           => true,
+				'data-date'                            => true,
+				'data-reason'                          => true,
+				'data-closed-event'                    => true,
+				'data-closed-rule'                     => true,
+				'data-open-override'                   => true,
+				'data-openkit-calendar-event-rows'     => true,
+				'data-openkit-calendar-event-row'      => true,
 				'data-openkit-calendar-event-template' => true,
-				'data-openkit-bulk-closed-panel'   => true,
+				'data-openkit-bulk-closed-panel'       => true,
 			)
 		);
 
@@ -62,17 +62,17 @@ class OpenCalendarKit_Admin_ClosedDays {
 		);
 
 		$allowed_html['button'] = array(
-			'id'                 => true,
-			'class'              => true,
-			'type'               => true,
-			'style'              => true,
-			'aria-label'         => true,
-			'data-date'          => true,
-			'data-reason'        => true,
-			'data-closed-event'  => true,
-			'data-closed-rule'   => true,
-			'data-open-override' => true,
-			'data-openkit-add-calendar-event' => true,
+			'id'                                 => true,
+			'class'                              => true,
+			'type'                               => true,
+			'style'                              => true,
+			'aria-label'                         => true,
+			'data-date'                          => true,
+			'data-reason'                        => true,
+			'data-closed-event'                  => true,
+			'data-closed-rule'                   => true,
+			'data-open-override'                 => true,
+			'data-openkit-add-calendar-event'    => true,
 			'data-openkit-remove-calendar-event' => true,
 		);
 
@@ -96,9 +96,9 @@ class OpenCalendarKit_Admin_ClosedDays {
 		);
 
 		$allowed_html['select'] = array(
-			'name'                     => true,
-			'class'                    => true,
-			'data-openkit-event-type'  => true,
+			'name'                    => true,
+			'class'                   => true,
+			'data-openkit-event-type' => true,
 		);
 
 		$allowed_html['option'] = array(
@@ -613,7 +613,7 @@ class OpenCalendarKit_Admin_ClosedDays {
 			$state           = ( $closed_by_event || ( $closed_by_rule && ! $open_override ) ) ? 'closed' : 'open';
 			$past            = $cell_date < $today;
 			$reason          = $closed_by_event ? self::get_reason( $cell_date ) : '';
-			$has_event       = is_array( $event ) && '' !== $event['summary'];
+			$has_event       = ! $past && is_array( $event ) && '' !== $event['summary'];
 			$event_color     = $has_event && ! empty( $event['color'] ) ? sanitize_html_class( (string) $event['color'] ) : 'blue';
 
 			$cells[] = array(

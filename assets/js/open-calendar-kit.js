@@ -30,7 +30,11 @@
 		var $box = $( '.bkit-modal .bkit-modal-box' );
 		var normalizedColor = String( color || 'blue' );
 
-		$box.removeClass( 'bkit-modal-box--event-blue bkit-modal-box--event-orange bkit-modal-box--event-yellow' );
+		$box.removeClass(
+			function (index, className) {
+				return ( className.match( /(^|\s)bkit-modal-box--event-\S+/g ) || [] ).join( ' ' );
+			}
+		);
 		$box.addClass( 'bkit-modal-box--event-' + normalizedColor );
 	}
 
