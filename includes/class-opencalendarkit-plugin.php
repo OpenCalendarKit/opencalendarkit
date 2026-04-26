@@ -18,7 +18,7 @@ if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.1.7' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.8' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {

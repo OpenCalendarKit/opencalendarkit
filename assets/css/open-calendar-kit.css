@@ -273,10 +273,13 @@
    ========================================================= */
 
 .bkit-calendar {
+  --okit-calendar-gap: 6px;
+  --okit-calendar-cell-min-height: 40px;
   border: 1px solid #e2e2e2;
   border-radius: 12px;
   padding: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+  width: 100%;
   max-width: 380px;
   margin: 0 auto;
 }
@@ -334,20 +337,30 @@
 .bkit-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: var(--okit-calendar-gap);
+  min-width: 0;
 }
 
 .bkit-cell {
   text-align: center;
-  padding: 8px;
+  padding: 8px 4px;
   border-radius: 10px;
-  min-height: 40px;
+  min-width: 0;
+  min-height: var(--okit-calendar-cell-min-height);
   border: none;
   background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: manual;
 }
 
 .bkit-wd {
   font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
   background: #fafafa;
 }
 
@@ -363,9 +376,16 @@
 }
 
 .bkit-cell.day .num {
+  display: block;
   position: relative;
   z-index: 2;
   font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: manual;
 }
 
 .bkit-cell.day.open {
@@ -432,7 +452,7 @@
 .bkit-calendar .bkit-cal-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 6px;
+  border-spacing: var(--okit-calendar-gap);
   table-layout: fixed;
 }
 
@@ -445,6 +465,9 @@
 .bkit-calendar .bkit-cal-table .bkit-wd {
   background: #fafafa;
   font-weight: 700;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .bkit-calendar .bkit-cal-table .bkit-empty {
@@ -457,8 +480,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 8px;
+  min-height: var(--okit-calendar-cell-min-height);
+  padding: 8px 4px;
   border-radius: 10px;
   border: 0;
   background: #f8f8f8;
@@ -566,7 +589,6 @@
 .bkit-calendar .bkit-grid button.bkit-cell {
   width: auto;
   max-width: none;
-  display: block;
 }
 
 .bkit-calendar .bkit-grid button.bkit-cell:focus {
