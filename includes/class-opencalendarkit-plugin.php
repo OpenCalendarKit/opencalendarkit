@@ -18,7 +18,7 @@ if ( ! defined( 'OPENKIT_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_VERSION' ) ) {
-	define( 'OPENKIT_PLUGIN_VERSION', '1.1.8' );
+	define( 'OPENKIT_PLUGIN_VERSION', '1.1.10' );
 }
 
 if ( ! defined( 'OPENKIT_PLUGIN_MAIN_FILE' ) ) {
@@ -58,8 +58,9 @@ class OpenCalendarKit_Plugin {
 	const OPTION_CALENDAR_EVENTS      = 'openkit_calendar_events';
 	const OPTION_EVENT_NOTICE_ENABLED = 'openkit_event_notice_enabled';
 	const OPTION_EVENT_NOTICE_CONTENT = 'openkit_event_notice_content';
-	const OPTION_EVENT_NOTICE_THEME   = 'openkit_event_notice_theme';
-	const OPTION_DATA_VERSION         = 'openkit_data_version';
+	const OPTION_EVENT_NOTICE_THEME     = 'openkit_event_notice_theme';
+	const OPTION_EVENT_NOTICE_FONT_SIZE = 'openkit_event_notice_font_size';
+	const OPTION_DATA_VERSION           = 'openkit_data_version';
 
 	const LEGACY_OPTION_SETTINGS             = 'okit_settings';
 	const LEGACY_OPTION_OPENING_HOURS        = 'bkit_mvp_opening_hours';
@@ -330,6 +331,10 @@ class OpenCalendarKit_Plugin {
 
 		if ( false === get_option( self::OPTION_EVENT_NOTICE_THEME, false ) ) {
 			add_option( self::OPTION_EVENT_NOTICE_THEME, 'blue' );
+		}
+
+		if ( false === get_option( self::OPTION_EVENT_NOTICE_FONT_SIZE, false ) ) {
+			add_option( self::OPTION_EVENT_NOTICE_FONT_SIZE, 'large' );
 		}
 
 		if ( false === get_option( self::SETTINGS_OPTION, false ) ) {

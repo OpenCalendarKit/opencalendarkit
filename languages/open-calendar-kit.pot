@@ -352,6 +352,10 @@ msgstr ""
 msgid "Announcement theme"
 msgstr ""
 
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:105
+msgid "Announcement font size"
+msgstr ""
+
 #: includes/Admin/class-opencalendarkit-admin-eventnotice.php:113
 msgid "Announcement text"
 msgstr ""
@@ -371,6 +375,22 @@ msgstr ""
 
 #: includes/Admin/class-opencalendarkit-admin-eventnotice.php:192
 msgid "Red"
+msgstr ""
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:247
+msgid "Normal"
+msgstr ""
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:251
+msgid "Large"
+msgstr ""
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:255
+msgid "Extra large"
+msgstr ""
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:259
+msgid "Very large"
 msgstr ""
 
 #: includes/Admin/class-opencalendarkit-admin-openinghours.php:36

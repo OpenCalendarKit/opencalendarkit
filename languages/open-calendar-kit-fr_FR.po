@@ -630,6 +630,10 @@ msgstr "Afficher l’annonce sur le site public lorsqu’un contenu est disponib
 msgid "Announcement theme"
 msgstr "Thème de l’annonce"
 
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:105
+msgid "Announcement font size"
+msgstr "Taille de police de l’annonce"
+
 #: includes/Admin/class-opencalendarkit-admin-eventnotice.php:113
 msgid "Announcement text"
 msgstr "Texte de l’annonce"
@@ -645,6 +649,22 @@ msgstr "Vert"
 #: includes/Admin/class-opencalendarkit-admin-eventnotice.php:192
 msgid "Red"
 msgstr "Rouge"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:247
+msgid "Normal"
+msgstr "Normal"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:251
+msgid "Large"
+msgstr "Grande"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:255
+msgid "Extra large"
+msgstr "Très grande"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:259
+msgid "Very large"
+msgstr "Très très grande"
 
 #: includes/Admin/class-opencalendarkit-admin-settings.php:376
 msgid "Delete text block"

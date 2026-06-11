@@ -634,6 +634,10 @@ msgstr "Die Ankündigung im Frontend anzeigen, wenn Inhalt vorhanden ist."
 msgid "Announcement theme"
 msgstr "Ankündigungs-Theme"
 
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:105
+msgid "Announcement font size"
+msgstr "Schriftgröße der Ankündigung"
+
 #: includes/Admin/class-opencalendarkit-admin-eventnotice.php:113
 msgid "Announcement text"
 msgstr "Ankündigungstext"
@@ -649,3 +653,19 @@ msgstr "Grün"
 #: includes/Admin/class-opencalendarkit-admin-eventnotice.php:192
 msgid "Red"
 msgstr "Rot"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:247
+msgid "Normal"
+msgstr "Normal"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:251
+msgid "Large"
+msgstr "Groß"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:255
+msgid "Extra large"
+msgstr "Sehr groß"
+
+#: includes/Admin/class-opencalendarkit-admin-eventnotice.php:259
+msgid "Very large"
+msgstr "Extra groß"

@@ -151,6 +151,8 @@
   display: block;
   width: 100%;
   margin: 0.9rem 0 1.2rem 0;
+  min-height: 0;
+  height: auto;
 }
 
 .bkit-ui-callout--notice {
@@ -226,8 +228,9 @@
 
 .bkit-event-notice__inner {
   display: block;
-  padding: 14px 16px;
-  min-height: 0;
+  padding: 10px 16px;
+  min-height: 0 !important;
+  height: auto !important;
 }
 
 .bkit-event-notice__body {
@@ -235,11 +238,11 @@
   width: 100%;
   margin: 0;
   padding: 0;
-  text-align: left;
   color: var(--okit-notice-text);
-  font-size: 1.08rem;
-  font-weight: 500;
-  line-height: 1.35;
+  font-size: var(--okit-event-notice-font-size, 1.18rem);
+  line-height: 1.3;
+  min-height: 0 !important;
+  height: auto !important;
 }
 
 .bkit-event-notice__body p,
@@ -248,19 +251,25 @@
   margin: 0;
   padding: 0;
   color: inherit;
+  font-size: inherit;
   line-height: inherit;
 }
 
-.bkit-event-notice__body p + p {
-  margin-top: 0.45rem;
+.bkit-event-notice__body p + p,
+.bkit-event-notice__body div + div {
+  margin-top: 0.35rem;
+}
+
+.bkit-event-notice__body > :empty {
+  display: none !important;
 }
 
 .bkit-event-notice__body > :first-child {
-  margin-top: 0;
+  margin-top: 0 !important;
 }
 
 .bkit-event-notice__body > :last-child {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 
 .bkit-event-notice__body a {
@@ -1167,12 +1176,12 @@
   }
 
   .bkit-event-notice__inner {
-    padding: 12px 14px;
+    padding: 11px 14px 9px;
   }
 
   .bkit-event-notice__body {
-    font-size: 1rem;
-    line-height: 1.3;
+    font-size: var(--okit-event-notice-font-size, 1.18rem);
+    line-height: 1.28;
   }
 
   .bkit-calendar-event-callout {

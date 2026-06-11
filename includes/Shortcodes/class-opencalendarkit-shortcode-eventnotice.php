@@ -32,27 +32,61 @@ class OpenCalendarKit_Shortcode_EventNotice {
 					return '';
 				}
 
-				$content = OpenCalendarKit_Admin_EventNotice::get_content();
+				$content = self::normalize_notice_html( OpenCalendarKit_Admin_EventNotice::get_content() );
 				if ( trim( wp_strip_all_tags( $content ) ) === '' ) {
 					return '';
 				}
 
-				$content = wpautop( wp_kses_post( $content ) );
-				$theme   = OpenCalendarKit_Admin_EventNotice::get_theme();
+				$theme               = OpenCalendarKit_Admin_EventNotice::get_theme();
+				$font_size_css_value = OpenCalendarKit_Admin_EventNotice::get_font_size_css_value();
 
-				ob_start();
-				?>
-				<div class="bkit-event-notice bkit-event-notice--<?php echo esc_attr( $theme ); ?> bkit-ui-callout bkit-ui-callout--notice bkit-ui-callout--notice-<?php echo esc_attr( $theme ); ?>" role="note">
-					<div class="bkit-ui-callout__inner bkit-event-notice__inner">
-						<div class="bkit-event-notice__body">
-							<?php echo wp_kses_post( $content ); ?>
-						</div>
-					</div>
-				</div>
-				<?php
-
-				return ob_get_clean();
+				return sprintf(
+					'<div class="bkit-event-notice bkit-event-notice--%1$s bkit-ui-callout bkit-ui-callout--notice bkit-ui-callout--notice-%1$s" role="note" style="%2$s"><div class="bkit-ui-callout__inner bkit-event-notice__inner"><div class="bkit-event-notice__body">%3$s</div></div></div>',
+					esc_attr( $theme ),
+					esc_attr( '--okit-event-notice-font-size: ' . $font_size_css_value . ';' ),
+					wp_kses_post( $content )
+				);
 			}
 		);
+	}
+
+	/**
+	 * Normalize editor HTML while preserving useful inline formatting.
+	 *
+	 * @param string $content Stored notice HTML.
+	 * @return string
+	 */
+	private static function normalize_notice_html( string $content ): string {
+		$content = wpautop( wp_kses_post( $content ) );
+		$content = self::remove_editor_fillers( $content );
+
+		return trim( $content );
+	}
+
+	/**
+	 * Remove invisible editor filler markup that creates extra visual height.
+	 *
+	 * @param string $content Rendered notice HTML.
+	 * @return string
+	 */
+	private static function remove_editor_fillers( string $content ): string {
+		$filler = '(?:\s|&nbsp;|&#160;|<br\s*\/?>|<span[^>]*>\s*<\/span>)*';
+
+		do {
+			$previous = $content;
+
+			$content = preg_replace( '/<(p|div)\b[^>]*>' . $filler . '<\/\1>/i', '', $content );
+			$content = is_string( $content ) ? $content : $previous;
+
+			$content = preg_replace(
+				'/(?:\s|&nbsp;|&#160;|<br\s*\/?>)+((?:<\/(?:strong|b|em|i|span)>)*<\/(?:p|div)>)/i',
+				'$1',
+				$content
+			);
+			$content = is_string( $content ) ? $content : $previous;
+			$content = trim( $content );
+		} while ( $content !== $previous );
+
+		return $content;
 	}
 }
